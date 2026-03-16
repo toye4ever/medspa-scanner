@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Med Spa Scanner</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #0a0a0c;
+  --surface: #131316;
+  --surface2: #1c1c21;
+  --surface3: #242429;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --border3: rgba(255,255,255,0.16);
+  --text: #eeeae2;
+  --muted: #7a7870;
+  --muted2: #555350;
+  --accent: #d4f74e;
+  --accent-dim: rgba(212,247,78,0.1);
+  --accent-text: #0a0a0c;
+  --info: #60b8f8;
+  --info-dim: rgba(96,184,248,0.1);
+  --warn: #f8c860;
+  --warn-dim: rgba(248,200,96,0.1);
+  --success: #60f8a8;
+  --success-dim: rgba(96,248,168,0.1);
+  --danger: #f86060;
+  --danger-dim: rgba(248,96,96,0.1);
+  --r: 10px;
+  --r-sm: 6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;}
+::selection{background:var(--accent);color:var(--accent-text);}
+
+/* Grain overlay */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5;}
+
+.shell{max-width:1080px;margin:0 auto;padding:2.5rem 1.5rem 5rem;position:relative;z-index:1;}
+
+/* Top bar */
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;gap:1rem;flex-wrap:wrap;}
+.brand h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;letter-spacing:-0.5px;line-height:1;}
+.brand h1 span{color:var(--accent);}
+.brand p{color:var(--muted);font-size:12px;margin-top:5px;letter-spacing:0.04em;text-transform:uppercase;}
+.tab-row{display:flex;gap:4px;}
+.tab{background:transparent;border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 16px;cursor:pointer;transition:all 0.15s;}
+.tab:hover{color:var(--text);border-color:var(--border3);}
+.tab.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text);}
+
+/* Panels */
+.panel{display:none;animation:fadeUp 0.2s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* API key bar */
+.key-bar{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.key-bar label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;white-space:nowrap;}
+.key-bar input{flex:1;min-width:200px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 12px;outline:none;transition:border-color 0.15s;font-family:'DM Mono',monospace;}
+.key-bar input:focus{border-color:var(--accent);}
+.key-status{font-size:12px;font-weight:500;white-space:nowrap;}
+.key-status.ok{color:var(--success);}
+.key-status.empty{color:var(--muted);}
+
+/* Search bar */
+.search-bar{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem;}
+.search-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px;}
+.field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;}
+.field input,.field select{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color 0.15s;width:100%;}
+.field input::placeholder{color:var(--muted2);}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field select option{background:var(--surface2);}
+
+/* Buttons */
+.btn{background:transparent;border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn:hover{background:var(--surface2);border-color:var(--border3);}
+.btn:active{transform:scale(0.97);}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:var(--accent-text);font-weight:600;}
+.btn-accent:hover{opacity:0.88;background:var(--accent);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.btn-ghost{border-color:transparent;color:var(--muted);}
+.btn-ghost:hover{color:var(--text);background:var(--surface2);border-color:var(--border);}
+.btn-success{background:var(--success-dim);border-color:var(--success);color:var(--success);}
+.btn-success:hover{opacity:0.85;}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.5rem;}
+.stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:0.9rem 1rem;position:relative;overflow:hidden;}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0;}
+.stat.s1::after{background:var(--muted);}
+.stat.s2::after{background:var(--info);}
+.stat.s3::after{background:var(--warn);}
+.stat.s4::after{background:var(--accent);}
+.stat-n{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:3px;}
+.stat.s4 .stat-n{color:var(--accent);}
+.stat-l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;font-weight:500;}
+
+/* Results grid */
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:1.5rem;}
+.result-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem;transition:border-color 0.15s;position:relative;}
+.result-card:hover{border-color:var(--border3);}
+.result-card.added{border-color:var(--accent);background:rgba(212,247,78,0.04);}
+.rc-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.rc-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;line-height:1.3;}
+.rc-rating{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--warn);white-space:nowrap;}
+.rc-rating span{color:var(--muted);font-size:11px;}
+.rc-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:4px;}
+.rc-row a{color:var(--info);text-decoration:none;}
+.rc-row a:hover{text-decoration:underline;}
+.rc-score{display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);}
+.score-bar{flex:1;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.score-fill{height:100%;border-radius:2px;transition:width 0.4s ease;}
+.score-label{font-size:11px;color:var(--muted);white-space:nowrap;}
+.rc-actions{display:flex;gap:6px;margin-top:10px;}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
+.badge-bad{background:var(--danger-dim);color:var(--danger);}
+.badge-ok{background:var(--warn-dim);color:var(--warn);}
+.badge-good{background:var(--success-dim);color:var(--success);}
+
+/* Filter bar */
+.filter-bar{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:0.9rem 1.25rem;margin-bottom:1.25rem;display:none;}
+.filter-bar.show{display:block;}
+.filter-bar-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.filter-bar .field input,.filter-bar .field select{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 12px;outline:none;transition:border-color 0.15s;width:100%;}
+.filter-bar .field input:focus,.filter-bar .field select:focus{border-color:var(--accent);}
+.filter-bar .field select option{background:var(--surface2);}
+.filter-tag{display:inline-flex;align-items:center;gap:5px;background:var(--accent-dim);border:0.5px solid rgba(212,247,78,0.3);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--accent);font-weight:500;}
+.filter-tag button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+.active-filters{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.result-count{font-size:12px;color:var(--muted);margin-bottom:10px;}
+/* Loader */
+.loader{display:none;text-align:center;padding:3rem 1rem;}
+.loader.active{display:block;}
+.spinner{width:32px;height:32px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader p{color:var(--muted);font-size:13px;}
+
+/* Empty */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:13px;display:none;}
+.empty-state.show{display:block;}
+.empty-icon{font-size:32px;margin-bottom:10px;}
+
+/* Table */
+.table-wrap{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+th{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;color:var(--muted);padding:10px 14px;border-bottom:0.5px solid var(--border);text-align:left;background:var(--surface);}
+td{padding:10px 14px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:middle;word-break:break-word;font-size:13px;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.col-name{width:20%;}
+.col-city{width:12%;}
+.col-phone{width:14%;}
+.col-web{width:17%;}
+.col-status{width:13%;}
+.col-notes{width:17%;}
+.col-del{width:7%;}
+td a{color:var(--info);text-decoration:none;}
+td a:hover{text-decoration:underline;}
+.tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;}
+.tag-new{background:var(--info-dim);color:var(--info);}
+.tag-contacted{background:var(--warn-dim);color:var(--warn);}
+.tag-interested{background:var(--accent-dim);color:var(--accent);}
+.tag-closed{background:var(--success-dim);color:var(--success);}
+.tag-pass{background:rgba(255,255,255,0.05);color:var(--muted);}
+.status-sel{background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;outline:none;padding:2px 4px;width:100%;}
+.status-sel option{background:#1c1c21;}
+.notes-inp{background:transparent;border:none;border-bottom:0.5px solid transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:2px 4px;width:100%;outline:none;transition:border-color 0.15s;}
+.notes-inp:focus{border-bottom-color:var(--border2);}
+.notes-inp::placeholder{color:var(--muted2);}
+.del-btn{background:transparent;border:none;color:var(--muted2);cursor:pointer;font-size:17px;padding:2px 6px;border-radius:4px;transition:all 0.15s;}
+.del-btn:hover{color:var(--danger);background:var(--danger-dim);}
+
+/* Add form */
+.add-form{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:1.25rem;margin-bottom:10px;display:none;animation:fadeUp 0.2s ease;}
+.add-form.open{display:block;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:8px;margin-bottom:12px;}
+.form-grid input,.form-grid select{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;width:100%;transition:border-color 0.15s;}
+.form-grid input::placeholder{color:var(--muted2);}
+.form-grid input:focus,.form-grid select:focus{border-color:var(--accent);}
+.form-grid select option{background:#1c1c21;}
+
+/* Toolbar */
+.toolbar{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:0.85rem 1.25rem;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.toolbar input,.toolbar select{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 12px;outline:none;transition:border-color 0.15s;}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--accent);}
+.toolbar input{min-width:200px;}
+.toolbar select option{background:#1c1c21;}
+.spacer{flex:1;}
+
+/* Progress */
+.prog-wrap{margin-bottom:1.5rem;}
+.prog-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;}
+.prog-meta span:last-child{color:var(--accent);font-weight:500;}
+.prog-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.5s ease;}
+
+/* Error */
+.error-msg{background:var(--danger-dim);border:0.5px solid var(--danger);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:1rem;display:none;}
+.error-msg.show{display:block;}
+
+@media(max-width:640px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .col-city,.col-web,.col-del{display:none;}
+  .col-name{width:28%;}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="brand">
+      <h1>Med Spa <span>Scanner</span></h1>
+      <p>Find leads · Track outreach · Close clients</p>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('scanner')">Scanner</button>
+      <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
+    </div>
+  </div>
+
+  <!-- API Key bar (shared) -->
+  <div class="key-bar">
+    <label>Google API Key</label>
+    <input type="password" id="api-key" placeholder="Paste your API key here — stored locally only" oninput="checkKey()" autocomplete="off" />
+    <span class="key-status empty" id="key-status">No key entered</span>
+  </div>
+
+  <!-- SCANNER PANEL -->
+  <div class="panel active" id="panel-scanner">
+    <div class="search-bar">
+      <div class="search-row">
+        <div class="field" style="flex:2;">
+          <label>City / Area</label>
+          <input type="text" id="s-city" placeholder="e.g. Bethesda MD" />
+        </div>
+        <div class="field" style="flex:2;">
+          <label>Search type</label>
+          <select id="s-type">
+            <option value="med spa">Med spa</option>
+            <option value="botox clinic">Botox clinic</option>
+            <option value="laser hair removal">Laser hair removal</option>
+            <option value="aesthetic clinic">Aesthetic clinic</option>
+            <option value="skin rejuvenation">Skin rejuvenation</option>
+            <option value="lip filler">Lip filler clinic</option>
+          </select>
+        </div>
+        <div class="field" style="flex:1;min-width:100px;">
+          <label>Radius</label>
+          <select id="s-radius">
+            <option value="5000">5 km</option>
+            <option value="10000" selected>10 km</option>
+            <option value="20000">20 km</option>
+            <option value="50000">50 km</option>
+          </select>
+        </div>
+        <button class="btn btn-accent" style="align-self:flex-end;" onclick="runScan()">Scan now</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="filter-bar" id="filter-bar">
+      <div class="filter-bar-row">
+        <div class="field" style="min-width:120px;">
+          <label>Website</label>
+          <select id="f-web-filter" onchange="applyFilters()">
+            <option value="">Any</option>
+            <option value="none">No website</option>
+            <option value="social">Social only</option>
+            <option value="has">Has website</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:120px;">
+          <label>Min rating</label>
+          <select id="f-rating-min" onchange="applyFilters()">
+            <option value="0">Any</option>
+            <option value="1">1+ stars</option>
+            <option value="2">2+ stars</option>
+            <option value="3">3+ stars</option>
+            <option value="4">4+ stars</option>
+            <option value="4.5">4.5+ stars</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:120px;">
+          <label>Max rating</label>
+          <select id="f-rating-max" onchange="applyFilters()">
+            <option value="5">Any</option>
+            <option value="3">Under 3</option>
+            <option value="4">Under 4</option>
+            <option value="4.5">Under 4.5</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:120px;">
+          <label>Reviews</label>
+          <select id="f-reviews" onchange="applyFilters()">
+            <option value="">Any</option>
+            <option value="few">Few (&lt;20)</option>
+            <option value="20">20+</option>
+            <option value="50">50+</option>
+            <option value="100">100+</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:150px;">
+          <label>Sort by</label>
+          <select id="f-sort" onchange="applyFilters()">
+            <option value="default">Default</option>
+            <option value="rating_asc">Rating: low first</option>
+            <option value="rating_desc">Rating: high first</option>
+            <option value="reviews_asc">Fewest reviews</option>
+            <option value="reviews_desc">Most reviews</option>
+            <option value="no_web">No website first</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="align-self:flex-end;" onclick="clearFilters()">Clear all</button>
+      </div>
+      <div class="active-filters" id="active-filters"></div>
+    </div>
+
+    <div class="loader" id="loader"><div class="spinner"></div><p id="loader-msg">Scanning Google Maps…</p></div>
+    <div id="result-count" style="font-size:12px;color:var(--muted);margin-bottom:10px;display:none;"></div>
+    <div id="scan-results"></div>
+    <div class="empty-state" id="scan-empty">
+      <div class="empty-icon">🔍</div>
+      Enter a city and hit Scan to find med spas in the area.
+    </div>
+    <div id="scan-actions" style="display:none; margin-top:4px; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-success" onclick="addAllVisible()">+ Add visible to tracker</button>
+      <button class="btn btn-ghost btn-sm" onclick="addAllToTracker()">Add all results</button>
+    </div>
+  </div>
+
+  <!-- TRACKER PANEL -->
+  <div class="panel" id="panel-tracker">
+    <div class="stats" id="stats"></div>
+    <div class="prog-wrap">
+      <div class="prog-meta"><span>Progress to first client</span><span id="prog-label">0 / 1 closed</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="add-form" id="add-form">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;margin-bottom:10px;">Add lead manually</div>
+      <div class="form-grid">
+        <input id="f-name" placeholder="Business name" />
+        <input id="f-city" placeholder="City" />
+        <input id="f-phone" placeholder="Phone number" />
+        <input id="f-web" placeholder="Website" />
+        <select id="f-status">
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="interested">Interested</option>
+          <option value="closed">Closed</option>
+          <option value="pass">Pass</option>
+        </select>
+        <input id="f-notes" placeholder="Notes" />
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-accent" onclick="addManual()">Save</button>
+        <button class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="filter-text" placeholder="Search by name or city…" oninput="renderTracker()" />
+      <select id="filter-status" onchange="renderTracker()">
+        <option value="">All statuses</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="interested">Interested</option>
+        <option value="closed">Closed</option>
+        <option value="pass">Pass</option>
+      </select>
+      <div class="spacer"></div>
+      <span id="t-count" style="font-size:12px;color:var(--muted);"></span>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export CSV</button>
+      <button class="btn btn-accent btn-sm" onclick="toggleForm()">+ Add lead</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-name">Business</th>
+            <th class="col-city">City</th>
+            <th class="col-phone">Phone</th>
+            <th class="col-web">Website</th>
+            <th class="col-status">Status</th>
+            <th class="col-notes">Notes</th>
+            <th class="col-del"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty-state" id="tracker-empty">
+        <div class="empty-icon">📋</div>
+        No leads yet — use the Scanner tab to find med spas, or add one manually.
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+const HARDCODED_KEY = 'AIzaSyAb-nogG7Pmn_UAthu1wHH4w7r6h_ni6uk';
+const SK = 'mss_leads_v1';
+let leads = [], nextId = 1, scanResults = [], visibleResults = [];
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(SK)||'null');
+    if(d){leads=d.leads||[];nextId=d.nextId||(leads.length?Math.max(...leads.map(l=>l.id))+1:1);}
+  } catch(e){}
+}
+function save(){try{localStorage.setItem(SK,JSON.stringify({leads,nextId}));}catch(e){}}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['scanner','tracker'][i]===t));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='tracker')renderTracker();
+}
+
+function checkKey(){
+  const k=document.getElementById('api-key').value.trim();
+  const s=document.getElementById('key-status');
+  if(k.length>10){s.textContent='Key saved locally';s.className='key-status ok';}
+  else if(HARDCODED_KEY!=='paste-your-api-key-here'){s.textContent='Using built-in key';s.className='key-status ok';}
+  else{s.textContent='No key entered';s.className='key-status empty';}
+}
+
+function getKey(){const typed=document.getElementById('api-key').value.trim();return typed||HARDCODED_KEY;}
+
+function showError(msg){const e=document.getElementById('error-msg');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),6000);}
+
+// ── SCANNER ──────────────────────────────────────────────────────────────────
+const PROXY='https://places-proxy.oluwatoye05.workers.dev/';
+function proxied(url){return PROXY+'?url='+encodeURIComponent(url);}
+
+async function geocode(city,key){
+  const url=`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${key}`;
+  const r=await fetch(proxied(url));
+  const d=await r.json();
+  if(d.status!=='OK')throw new Error('Could not find that location. Try "City, State"');
+  return d.results[0].geometry.location;
+}
+
+async function placesSearch(lat,lng,radius,keyword,key,pageToken){
+  let url=`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&keyword=${encodeURIComponent(keyword)}&key=${key}`;
+  if(pageToken)url+=`&pagetoken=${pageToken}`;
+  const r=await fetch(proxied(url));
+  return r.json();
+}
+
+async function getDetails(placeId,key){
+  const url=`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number,website,rating,user_ratings_total,formatted_address&key=${key}`;
+  const r=await fetch(proxied(url));
+  const d=await r.json();
+  return d.result||{};
+}
+
+function scoreWebsite(w){
+  if(!w)return{score:0,label:'No website',color:'var(--danger)',type:'none'};
+  if(w.includes('facebook.com')||w.includes('instagram.com'))return{score:25,label:'Social only',color:'var(--warn)',type:'social'};
+  return{score:80,label:'Has website',color:'var(--success)',type:'has'};
+}
+
+function applyFilters(){
+  const wf=document.getElementById('f-web-filter').value;
+  const rmin=parseFloat(document.getElementById('f-rating-min').value)||0;
+  const rmax=parseFloat(document.getElementById('f-rating-max').value)||5;
+  const rev=document.getElementById('f-reviews').value;
+  const sort=document.getElementById('f-sort').value;
+  let filtered=[...scanResults];
+  if(wf) filtered=filtered.filter(p=>scoreWebsite(p.website).type===wf);
+  if(rmin>0) filtered=filtered.filter(p=>(p.rating||0)>=rmin);
+  if(rmax<5) filtered=filtered.filter(p=>(p.rating||0)<rmax);
+  if(rev==='few') filtered=filtered.filter(p=>(p.reviews||0)<20);
+  else if(rev==='20') filtered=filtered.filter(p=>(p.reviews||0)>=20);
+  else if(rev==='50') filtered=filtered.filter(p=>(p.reviews||0)>=50);
+  else if(rev==='100') filtered=filtered.filter(p=>(p.reviews||0)>=100);
+  if(sort==='rating_asc') filtered.sort((a,b)=>(a.rating||0)-(b.rating||0));
+  else if(sort==='rating_desc') filtered.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else if(sort==='reviews_asc') filtered.sort((a,b)=>(a.reviews||0)-(b.reviews||0));
+  else if(sort==='reviews_desc') filtered.sort((a,b)=>(b.reviews||0)-(a.reviews||0));
+  else if(sort==='no_web') filtered.sort((a,b)=>scoreWebsite(a.website).score-scoreWebsite(b.website).score);
+  visibleResults=filtered;
+  const wfLabels={none:'No website',social:'Social only',has:'Has website'};
+  const tags=[];
+  if(wf) tags.push({label:wfLabels[wf],key:'wf'});
+  if(rmin>0) tags.push({label:`${rmin}+ stars`,key:'rmin'});
+  if(rmax<5) tags.push({label:`Under ${rmax} stars`,key:'rmax'});
+  if(rev==='few') tags.push({label:'<20 reviews',key:'rev'});
+  else if(rev) tags.push({label:`${rev}+ reviews`,key:'rev'});
+  if(sort!=='default') tags.push({label:'Custom sort',key:'sort'});
+  document.getElementById('active-filters').innerHTML=tags.map(t=>`<span class="filter-tag">${t.label}<button onclick="clearFilter('${t.key}')">×</button></span>`).join('');
+  const rc=document.getElementById('result-count');
+  if(scanResults.length){rc.style.display='block';rc.textContent=`Showing ${filtered.length} of ${scanResults.length} results`;}
+  renderCards(filtered);
+}
+
+function clearFilter(key){
+  if(key==='wf')document.getElementById('f-web-filter').value='';
+  if(key==='rmin')document.getElementById('f-rating-min').value='0';
+  if(key==='rmax')document.getElementById('f-rating-max').value='5';
+  if(key==='rev')document.getElementById('f-reviews').value='';
+  if(key==='sort')document.getElementById('f-sort').value='default';
+  applyFilters();
+}
+
+function clearFilters(){
+  document.getElementById('f-web-filter').value='';
+  document.getElementById('f-rating-min').value='0';
+  document.getElementById('f-rating-max').value='5';
+  document.getElementById('f-reviews').value='';
+  document.getElementById('f-sort').value='default';
+  applyFilters();
+}
+
+function renderCards(places){
+  const grid=document.getElementById('scan-results');
+  const actions=document.getElementById('scan-actions');
+  if(!places.length){
+    grid.innerHTML=scanResults.length?`<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">No results match your filters. <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear filters</button></div>`:'';
+    if(!scanResults.length)document.getElementById('scan-empty').classList.add('show');
+    actions.style.display='none';return;
+  }
+  document.getElementById('scan-empty').classList.remove('show');
+  actions.style.display='flex';
+  grid.innerHTML=`<div class="results-grid">${places.map(p=>{
+    const gi=scanResults.indexOf(p);
+    const ws=scoreWebsite(p.website);
+    const inTracker=leads.some(l=>l.name===p.name);
+    const stars='★'.repeat(Math.round(p.rating||0))+'☆'.repeat(5-Math.round(p.rating||0));
+    const city=(p.address||'').split(',')[1]||'';
+    return `<div class="result-card${inTracker?' added':''}" id="rc-${gi}">
+      <div class="rc-header"><div class="rc-name">${esc(p.name)}</div><div class="rc-rating">${stars} <span>(${p.reviews||0})</span></div></div>
+      <div class="rc-row">${esc(city.trim())}</div>
+      <div class="rc-row">${p.phone?`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`:'<span style="color:var(--danger)">No phone</span>'}</div>
+      <div class="rc-row">${p.website?`<a href="${esc(p.website)}" target="_blank">${esc(p.website.replace(/https?:\/\//,'').split('/')[0])}</a>`:'<span style="color:var(--danger)">No website</span>'}</div>
+      <div class="rc-score">
+        <div class="score-label">Website</div>
+        <div class="score-bar"><div class="score-fill" style="width:${ws.score}%;background:${ws.color};"></div></div>
+        <span class="badge ${ws.score<30?'badge-bad':ws.score<70?'badge-ok':'badge-good'}">${ws.label}</span>
+      </div>
+      <div class="rc-actions">${inTracker?'<span style="font-size:12px;color:var(--success);">✓ In tracker</span>':`<button class="btn btn-sm btn-accent" onclick="addOne(${gi})">+ Add to tracker</button>`}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+async function runScan(){
+  const key=getKey();
+  if(!key||key==='paste-your-api-key-here'){showError('Please enter your Google API key above first.');return;}
+  const city=document.getElementById('s-city').value.trim();
+  if(!city){showError('Enter a city or area to search.');return;}
+  const keyword=document.getElementById('s-type').value;
+  const radius=document.getElementById('s-radius').value;
+  document.getElementById('loader').classList.add('active');
+  document.getElementById('loader-msg').textContent='Finding location…';
+  document.getElementById('scan-results').innerHTML='';
+  document.getElementById('scan-empty').classList.remove('show');
+  document.getElementById('scan-actions').style.display='none';
+  document.getElementById('error-msg').classList.remove('show');
+  document.getElementById('filter-bar').classList.remove('show');
+  document.getElementById('result-count').style.display='none';
+  try{
+    const loc=await geocode(city,key);
+    document.getElementById('loader-msg').textContent=`Scanning for "${keyword}" near ${city}…`;
+    const data=await placesSearch(loc.lat,loc.lng,radius,keyword,key);
+    if(data.status==='REQUEST_DENIED'){throw new Error('API key rejected — make sure Places API and Geocoding API are both enabled in Google Cloud Console.');}
+    if(data.status==='ZERO_RESULTS'||!data.results?.length){document.getElementById('loader').classList.remove('active');document.getElementById('scan-empty').classList.add('show');return;}
+    document.getElementById('loader-msg').textContent=`Loading details for ${data.results.length} businesses…`;
+    const detailed=await Promise.all(data.results.slice(0,20).map(async p=>{
+      try{const det=await getDetails(p.place_id,key);return{name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
+      catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
+    }));
+    scanResults=detailed;visibleResults=detailed;
+    document.getElementById('loader').classList.remove('active');
+    document.getElementById('filter-bar').classList.add('show');
+    clearFilters();
+  }catch(e){
+    document.getElementById('loader').classList.remove('active');
+    showError(e.message||'Something went wrong. Check your API key and try again.');
+  }
+}
+
+function addOne(i){
+  const p=scanResults[i];
+  if(!p||leads.some(l=>l.name===p.name))return;
+  const city=(p.address||'').split(',').slice(1,2).join('').trim();
+  const web=(p.website||'').replace(/https?:\/\//,'').split('/')[0];
+  leads.push({id:nextId++,name:p.name,city,phone:p.phone||'',web,status:'new',notes:''});
+  save();updateTrackerCount();
+  const card=document.getElementById('rc-'+i);
+  if(card){card.classList.add('added');card.querySelector('.rc-actions').innerHTML='<span style="font-size:12px;color:var(--success);">✓ In tracker</span>';}
+}
+
+function addAllVisible(){visibleResults.forEach(p=>{const i=scanResults.indexOf(p);if(i>=0)addOne(i);});switchTab('tracker');}
+function addAllToTracker(){scanResults.forEach((_,i)=>addOne(i));switchTab('tracker');}
+
+// ── TRACKER ──────────────────────────────────────────────────────────────────
+function renderStats(){
+  const total=leads.length,contacted=leads.filter(l=>['contacted','interested','closed'].includes(l.status)).length,interested=leads.filter(l=>l.status==='interested').length,closed=leads.filter(l=>l.status==='closed').length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat s1"><div class="stat-n">${total}</div><div class="stat-l">Total leads</div></div>
+    <div class="stat s2"><div class="stat-n">${contacted}</div><div class="stat-l">Contacted</div></div>
+    <div class="stat s3"><div class="stat-n">${interested}</div><div class="stat-l">Interested</div></div>
+    <div class="stat s4"><div class="stat-n">${closed}</div><div class="stat-l">Closed</div></div>`;
+  document.getElementById('prog-fill').style.width=Math.min(closed*100,100)+'%';
+  document.getElementById('prog-label').textContent=closed+' / 1 closed';
+}
+
+function renderTracker(){
+  renderStats();
+  const ft=document.getElementById('filter-text').value.toLowerCase();
+  const fs=document.getElementById('filter-status').value;
+  const f=leads.filter(l=>(!ft||(l.name||'').toLowerCase().includes(ft)||(l.city||'').toLowerCase().includes(ft))&&(!fs||l.status===fs));
+  document.getElementById('t-count').textContent=f.length+' lead'+(f.length!==1?'s':'');
+  const tbody=document.getElementById('tbody'),empty=document.getElementById('tracker-empty');
+  if(!f.length){tbody.innerHTML='';empty.classList.add('show');return;}
+  empty.classList.remove('show');
+  tbody.innerHTML=f.map(l=>`<tr>
+    <td class="col-name" style="font-weight:500;">${esc(l.name)}</td>
+    <td class="col-city" style="color:var(--muted);">${esc(l.city)}</td>
+    <td class="col-phone">${l.phone?`<a href="tel:${esc(l.phone)}">${esc(l.phone)}</a>`:''}</td>
+    <td class="col-web">${l.web?`<a href="https://${esc(l.web)}" target="_blank">${esc(l.web)}</a>`:''}</td>
+    <td class="col-status"><select class="status-sel" onchange="updStatus(${l.id},this.value)">${['new','contacted','interested','closed','pass'].map(s=>`<option value="${s}" ${l.status===s?'selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></td>
+    <td class="col-notes"><input class="notes-inp" value="${esc(l.notes||'')}" placeholder="Add note…" onchange="updNotes(${l.id},this.value)" /></td>
+    <td class="col-del" style="text-align:center;"><button class="del-btn" onclick="delLead(${l.id})">×</button></td>
+  </tr>`).join('');
+}
+
+function updateTrackerCount(){const n=leads.length;document.getElementById('tracker-count').textContent=n?`(${n})`:'';renderStats();}
+
+function updStatus(id,v){const l=leads.find(l=>l.id===id);if(l){l.status=v;save();renderStats();}}
+function updNotes(id,v){const l=leads.find(l=>l.id===id);if(l){l.notes=v;save();}}
+function delLead(id){if(!confirm('Remove this lead?'))return;leads=leads.filter(l=>l.id!==id);save();renderTracker();}
+
+function toggleForm(){document.getElementById('add-form').classList.toggle('open');}
+function addManual(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){document.getElementById('f-name').focus();return;}
+  leads.push({id:nextId++,name,city:document.getElementById('f-city').value.trim(),phone:document.getElementById('f-phone').value.trim(),web:document.getElementById('f-web').value.trim(),status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim()});
+  ['f-name','f-city','f-phone','f-web','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-status').value='new';
+  save();renderTracker();updateTrackerCount();
+  document.getElementById('add-form').classList.remove('open');
+}
+
+function exportCSV(){
+  const h=['Business','City','Phone','Website','Status','Notes'];
+  const rows=leads.map(l=>[l.name,l.city,l.phone,l.web,l.status,l.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv'}));a.download='medspa_leads.csv';a.click();
+}
+
+load();renderTracker();updateTrackerCount();checkKey();
+document.getElementById('scan-empty').classList.add('show');
+</script>
+</body>
+</html>
