@@ -83,6 +83,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-accent:hover{opacity:0.88;background:var(--accent);}
 .btn-sm{padding:5px 11px;font-size:12px;}
 .btn-ghost{border-color:transparent;color:var(--muted);}
+.btn-bulk{background:var(--accent-dim);border:0.5px solid rgba(212,247,78,0.4);border-radius:var(--r-sm);color:var(--accent);font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;padding:8px 16px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-bulk:hover{background:var(--accent);color:var(--accent-text);}
+.kw-tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
+.kw-tag.pending{background:var(--surface2);color:var(--muted);}
+.kw-tag.running{background:var(--warn-dim);color:var(--warn);}
+.kw-tag.done{background:var(--success-dim);color:var(--success);}
 .btn-ghost:hover{color:var(--text);background:var(--surface2);border-color:var(--border);}
 .btn-success{background:var(--success-dim);border-color:var(--success);color:var(--success);}
 .btn-success:hover{opacity:0.85;}
@@ -258,7 +264,13 @@ td a:hover{text-decoration:underline;}
             <option value="50000">50 km</option>
           </select>
         </div>
-        <button class="btn btn-accent" style="align-self:flex-end;" onclick="runScan()">Scan now</button>
+        <button class="btn btn-accent" style="align-self:flex-end;" onclick="runScan()">Scan</button>
+        <button class="btn btn-bulk" style="align-self:flex-end;" onclick="runBulkScan()"><button class="btn btn-accent" style="align-self:flex-end;" onclick="runScan()">Scan now</button>#9889; Bulk scan all</button>
+      </div>
+      <div id="bulk-progress" style="display:none;margin-top:1rem;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;"><span id="bulk-status">Scanning...</span><span id="bulk-count"></span></div>
+        <div style="height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;"><div id="bulk-bar" style="height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width 0.3s ease;"></div></div>
+        <div id="bulk-keywords" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
       </div>
     </div>
 
@@ -404,7 +416,7 @@ td a:hover{text-decoration:underline;}
 
 </div>
 <script>
-const HARDCODED_KEY = 'AIzaSyAb-nogG7Pmn_UAthu1wHH4w7r6h_ni6uk';
+const HARDCODED_KEY = 'paste-your-api-key-here';
 const SK = 'mss_leads_v1';
 let leads = [], nextId = 1, scanResults = [], visibleResults = [];
 
@@ -658,6 +670,88 @@ function exportCSV(){
 }
 
 load();renderTracker();updateTrackerCount();checkKey();
+
+const BULK_KEYWORDS = ["med spa","botox clinic","laser hair removal","aesthetic clinic","skin rejuvenation","lip filler clinic"];
+
+async function runBulkScan(){
+  const key = getKey();
+  if(!key || key === 'paste-your-api-key-here'){ showError('Please enter your Google API key first.'); return; }
+  const city = document.getElementById('s-city').value.trim();
+  if(!city){ showError('Enter a city or area to search.'); return; }
+  const radius = document.getElementById('s-radius').value;
+
+  document.getElementById('bulk-progress').style.display = 'block';
+  document.getElementById('scan-results').innerHTML = '';
+  document.getElementById('scan-empty').classList.remove('show');
+  document.getElementById('scan-actions').style.display = 'none';
+  document.getElementById('filter-bar').classList.remove('show');
+  document.getElementById('result-count').style.display = 'none';
+  document.getElementById('error-msg').classList.remove('show');
+
+  const kwDiv = document.getElementById('bulk-keywords');
+  kwDiv.innerHTML = BULK_KEYWORDS.map((k,i) => `<span class="kw-tag pending" id="kw-${i}">${k}</span>`).join('');
+
+  let loc;
+  try {
+    document.getElementById('bulk-status').textContent = 'Finding location...';
+    loc = await geocode(city, key);
+  } catch(e) {
+    showError(e.message);
+    document.getElementById('bulk-progress').style.display = 'none';
+    return;
+  }
+
+  const allResults = [];
+  const seenNames = new Set(leads.map(l => l.name.toLowerCase()));
+
+  for(let i = 0; i < BULK_KEYWORDS.length; i++){
+    const kw = BULK_KEYWORDS[i];
+    document.getElementById(`kw-${i}`).className = 'kw-tag running';
+    document.getElementById('bulk-status').textContent = `Scanning: ${kw}...`;
+    document.getElementById('bulk-bar').style.width = Math.round((i / BULK_KEYWORDS.length) * 100) + '%';
+
+    try {
+      const data = await placesSearch(loc.lat, loc.lng, radius, kw, key);
+      if(data.results && data.results.length){
+        const detailed = await Promise.all(data.results.slice(0,20).map(async p => {
+          if(seenNames.has(p.name.toLowerCase())) return null;
+          try {
+            const det = await getDetails(p.place_id, key);
+            return { name:p.name, phone:det.formatted_phone_number||'', website:det.website||'', address:det.formatted_address||p.vicinity||'', rating:p.rating||0, reviews:p.user_ratings_total||0 };
+          } catch(e) {
+            return { name:p.name, phone:'', website:'', address:p.vicinity||'', rating:p.rating||0, reviews:p.user_ratings_total||0 };
+          }
+        }));
+        detailed.filter(Boolean).forEach(p => {
+          if(!seenNames.has(p.name.toLowerCase())){
+            seenNames.add(p.name.toLowerCase());
+            allResults.push(p);
+          }
+        });
+      }
+    } catch(e) {}
+
+    document.getElementById(`kw-${i}`).className = 'kw-tag done';
+    document.getElementById('bulk-count').textContent = allResults.length + ' unique found';
+  }
+
+  document.getElementById('bulk-bar').style.width = '100%';
+  document.getElementById('bulk-status').textContent = `Done! Adding ${allResults.length} leads to tracker...`;
+
+  allResults.forEach(p => {
+    const c = (p.address||'').split(',').slice(1,2).join('').trim();
+    const w = (p.website||'').replace(/https?:\/\//,'').split('/')[0];
+    leads.push({ id:nextId++, name:p.name, city:c, phone:p.phone||'', web:w, status:'new', notes:'' });
+  });
+  save(); updateTrackerCount();
+
+  scanResults = allResults; visibleResults = allResults;
+  document.getElementById('filter-bar').classList.add('show');
+  document.getElementById('bulk-status').textContent = `\u2713 Added ${allResults.length} new leads to your tracker!`;
+  clearFilters();
+
+  setTimeout(() => switchTab('tracker'), 1500);
+}
 document.getElementById('scan-empty').classList.add('show');
 </script>
 </body>
