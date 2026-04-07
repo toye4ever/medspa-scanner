@@ -954,6 +954,17 @@ async function runScan(){
     document.getElementById('loader').classList.remove('active');
     document.getElementById('filter-bar').classList.add('show');
     clearFilters();
+    // Apply autoFilterNoWeb setting
+    const _s=getSettings();
+    if(_s.autoFilterNoWeb){
+      document.getElementById('f-sort').value='no_web';
+      applyFilters();
+    }
+    // Auto-add to tracker if setting is on
+    if(_s.autoAddTracker){
+      detailed.forEach((_,i)=>addOne(i));
+      updateTrackerCount();
+    }
     // Run AI relevance scoring if a search type was entered and Gemini key exists
     if(kw&&getGeminiKey()){
       aiScoreResults(kw,detailed);
@@ -1007,9 +1018,9 @@ ${list}`;
         scanResults[s.index].aiReason=s.reason||'';
       }
     });
-    // Sort visible results by AI score descending
+    // Sort visibleResults by AI score but keep scanResults in original order
+    // so card indices (gi = scanResults.indexOf(p)) remain valid
     visibleResults=[...scanResults].sort((a,b)=>(b.aiScore||0)-(a.aiScore||0));
-    scanResults=[...visibleResults]; // keep scan order matched
 
     const highCount=scores.filter(s=>s.score>=70).length;
     spinner.style.display='none';
@@ -1135,6 +1146,8 @@ async function runBulkScan(){
   document.getElementById('filter-bar').classList.add('show');
   document.getElementById('bulk-status').textContent=`\u2713 Added ${allResults.length} new leads to your tracker!`;
   clearFilters();
+  const _bs=getSettings();
+  if(_bs.autoFilterNoWeb){document.getElementById('f-sort').value='no_web';applyFilters();}
   setTimeout(()=>switchTab('tracker'),1500);
 }
 
