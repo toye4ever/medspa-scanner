@@ -260,6 +260,66 @@ td a:hover{text-decoration:underline;}
   .demo-grid{grid-template-columns:1fr;}
   .ai-window{width:calc(100vw - 40px);right:-8px;}
 }
+
+/* ── SETTINGS PANEL ─────────────────────────────────────────────────────── */
+.settings-layout{display:grid;grid-template-columns:180px 1fr;gap:1.5rem;align-items:start;}
+.settings-nav{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;position:sticky;top:1rem;}
+.settings-nav-item{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:0.5px solid var(--border);transition:all 0.15s;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
+.settings-nav-item:last-child{border-bottom:none;}
+.settings-nav-item:hover{color:var(--text);background:var(--surface2);}
+.settings-nav-item.active{color:var(--accent);background:var(--accent-dim);font-weight:500;}
+.settings-nav-item .sni{font-size:15px;}
+.settings-content{display:flex;flex-direction:column;gap:1.25rem;}
+.settings-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.5rem;display:none;}
+.settings-card.active{display:block;}
+.settings-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.settings-card-desc{font-size:12px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6;}
+.settings-group{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+.settings-field{display:flex;flex-direction:column;gap:5px;}
+.settings-field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;}
+.settings-field input,.settings-field select,.settings-field textarea{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color 0.15s;width:100%;}
+.settings-field input[type=password]{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.05em;}
+.settings-field input:focus,.settings-field select:focus,.settings-field textarea:focus{border-color:var(--accent);}
+.settings-field select option{background:var(--surface2);}
+.settings-field textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.settings-hint{font-size:11px;color:var(--muted2);margin-top:3px;line-height:1.5;}
+.settings-divider{height:0.5px;background:var(--border);margin:1.25rem 0;}
+.settings-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+.settings-row label{font-size:13px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:7px;}
+.settings-row input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
+.key-indicator{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;margin-left:auto;}
+.key-indicator.ok{background:var(--success-dim);color:var(--success);border:0.5px solid var(--success);}
+.key-indicator.partial{background:var(--warn-dim);color:var(--warn);border:0.5px solid var(--warn);}
+.key-indicator.empty{background:var(--danger-dim);color:var(--danger);border:0.5px solid var(--danger);}
+.security-note{background:var(--warn-dim);border:0.5px solid rgba(248,200,96,0.3);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--warn);line-height:1.6;margin-top:1rem;}
+.security-note strong{font-weight:600;}
+.kw-edit-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border);}
+.kw-edit-row:last-child{border-bottom:none;}
+.kw-edit-row input{flex:1;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;transition:border-color 0.15s;}
+.kw-edit-row input:focus{border-color:var(--accent);}
+.kw-num{font-size:11px;color:var(--muted2);font-family:'DM Mono',monospace;width:16px;text-align:right;flex-shrink:0;}
+.save-confirm{display:none;font-size:12px;color:var(--success);font-weight:500;margin-left:8px;}
+.save-confirm.show{display:inline;}
+.danger-zone{background:var(--danger-dim);border:0.5px solid rgba(248,96,96,0.2);border-radius:var(--r-sm);padding:1rem;}
+.danger-zone-title{font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+@media(max-width:640px){.settings-layout{grid-template-columns:1fr;}.settings-group{grid-template-columns:1fr;}}
+
+/* ── AI RELEVANCE ────────────────────────────────────────────────────────── */
+.ai-filter-bar{background:var(--surface);border:0.5px solid rgba(212,247,78,0.2);border-radius:var(--r-sm);padding:8px 14px;margin-bottom:1rem;display:none;align-items:center;gap:8px;font-size:12px;color:var(--accent);}
+.ai-filter-bar.show{display:flex;}
+.ai-filter-spinner{width:14px;height:14px;border:1.5px solid rgba(212,247,78,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+.ai-rel-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;white-space:nowrap;}
+.ai-rel-high{background:rgba(212,247,78,0.15);color:var(--accent);border:0.5px solid rgba(212,247,78,0.4);}
+.ai-rel-mid{background:var(--warn-dim);color:var(--warn);border:0.5px solid rgba(248,200,96,0.4);}
+.ai-rel-low{background:rgba(255,255,255,0.05);color:var(--muted);border:0.5px solid var(--border2);}
+.search-type-wrap{position:relative;flex:2;}
+.search-type-wrap input{width:100%;}
+.type-suggestions{position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);margin-top:3px;z-index:50;display:none;max-height:220px;overflow-y:auto;}
+.type-suggestions.open{display:block;}
+.type-sug-item{padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;border-bottom:0.5px solid var(--border);}
+.type-sug-item:last-child{border-bottom:none;}
+.type-sug-item:hover,.type-sug-item.active{background:var(--surface3);color:var(--accent);}
+.type-sug-group{padding:5px 12px 3px;font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;background:var(--surface);}
 </style>
 </head>
 <body>
@@ -270,21 +330,15 @@ td a:hover{text-decoration:underline;}
       <h1>Med Spa <span>Scanner</span></h1>
       <p>Find leads · Track outreach · Close clients</p>
     </div>
-    <div class="tab-row">
-      <button class="tab active" onclick="switchTab('scanner')">Scanner</button>
-      <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
-      <button class="tab" onclick="switchTab('demo')">Demo Builder</button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div id="topbar-key-status" class="key-indicator empty" onclick="switchTab('settings')" style="cursor:pointer;" title="Click to configure API keys">⚠ Keys not set</div>
+      <div class="tab-row">
+        <button class="tab active" onclick="switchTab('scanner')">Scanner</button>
+        <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
+        <button class="tab" onclick="switchTab('demo')">Demo Builder</button>
+        <button class="tab" onclick="switchTab('settings')">⚙ Settings</button>
+      </div>
     </div>
-  </div>
-
-  <!-- KEY BAR -->
-  <div class="key-bar">
-    <label>Places Key</label>
-    <input type="password" id="api-key" placeholder="Google Places API key" oninput="checkKey()" autocomplete="off"/>
-    <div class="key-divider"></div>
-    <label>Gemini Key</label>
-    <input type="password" id="gemini-key" placeholder="Gemini API key" oninput="checkKey()" autocomplete="off"/>
-    <span class="key-status empty" id="key-status">No keys entered</span>
   </div>
 
   <!-- SCANNER PANEL -->
@@ -295,16 +349,11 @@ td a:hover{text-decoration:underline;}
           <label>City / Area</label>
           <input type="text" id="s-city" placeholder="e.g. Silver Spring, Maryland"/>
         </div>
-        <div class="field" style="flex:2;">
-          <label>Search type</label>
-          <select id="s-type">
-            <option value="med spa">Med spa</option>
-            <option value="botox clinic">Botox clinic</option>
-            <option value="laser hair removal">Laser hair removal</option>
-            <option value="aesthetic clinic">Aesthetic clinic</option>
-            <option value="skin rejuvenation">Skin rejuvenation</option>
-            <option value="lip filler">Lip filler clinic</option>
-          </select>
+        <div class="field search-type-wrap" style="flex:2;">
+          <label>Business type <span style="color:var(--muted2);font-size:10px;text-transform:none;letter-spacing:0;">(optional — blank = all businesses)</span></label>
+          <input type="text" id="s-type" placeholder="e.g. med spa, dentist, gym, nail salon…" autocomplete="off"
+            oninput="showTypeSuggestions(this.value)" onfocus="showTypeSuggestions(this.value)" onkeydown="typeSugKeydown(event)"/>
+          <div class="type-suggestions" id="type-suggestions"></div>
         </div>
         <div class="field" style="flex:1;min-width:100px;">
           <label>Radius</label>
@@ -330,6 +379,10 @@ td a:hover{text-decoration:underline;}
     </div>
 
     <div class="error-msg" id="error-msg"></div>
+    <div class="ai-filter-bar" id="ai-filter-bar">
+      <div class="ai-filter-spinner" id="ai-filter-spinner"></div>
+      <span id="ai-filter-msg">AI is scoring results for relevance…</span>
+    </div>
 
     <div class="filter-bar" id="filter-bar">
       <div class="filter-bar-row">
@@ -483,6 +536,163 @@ td a:hover{text-decoration:underline;}
     </div>
   </div>
 
+  <!-- SETTINGS PANEL -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-layout">
+      <nav class="settings-nav">
+        <button class="settings-nav-item active" onclick="showSettingsSection('keys')"><span class="sni">🔑</span> API Keys</button>
+        <button class="settings-nav-item" onclick="showSettingsSection('scan')"><span class="sni">🔍</span> Scan Defaults</button>
+        <button class="settings-nav-item" onclick="showSettingsSection('keywords')"><span class="sni">📋</span> Bulk Keywords</button>
+        <button class="settings-nav-item" onclick="showSettingsSection('outreach')"><span class="sni">✉️</span> Outreach</button>
+        <button class="settings-nav-item" onclick="showSettingsSection('data')"><span class="sni">💾</span> Data</button>
+        <button class="settings-nav-item" onclick="showSettingsSection('about')"><span class="sni">ℹ️</span> About</button>
+      </nav>
+      <div class="settings-content">
+
+        <!-- API KEYS -->
+        <div class="settings-card active" id="sc-keys">
+          <div class="settings-card-title">🔑 API Keys</div>
+          <div class="settings-card-desc">Enter your API keys once — they're saved in your browser's localStorage and never hardcoded in the app source.</div>
+          <div class="settings-group">
+            <div class="settings-field">
+              <label>Google Places API Key</label>
+              <input type="password" id="s-places-key" placeholder="AIzaSy..." autocomplete="off"/>
+              <div class="settings-hint">Required for scanning. Enable <strong>Places API</strong> and <strong>Geocoding API</strong> in Google Cloud Console.</div>
+            </div>
+            <div class="settings-field">
+              <label>Gemini API Key</label>
+              <input type="password" id="s-gemini-key" placeholder="AIzaSy..." autocomplete="off"/>
+              <div class="settings-hint">Required for AI assistant &amp; auto-fill. Get from <strong>aistudio.google.com</strong>.</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-accent" onclick="saveApiKeys()">💾 Save Keys</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleKeyVisibility()">👁 Show / Hide</button>
+            <span class="save-confirm" id="keys-saved-confirm">✓ Keys saved!</span>
+            <div id="settings-key-status" class="key-indicator empty" style="margin-left:auto;">No keys set</div>
+          </div>
+          <div class="security-note" style="margin-top:1.25rem;">
+            <strong>🔒 About key security:</strong> <code>localStorage</code> hides your keys from source-code inspection but they're still readable by JavaScript on this page. For true production-grade security, store your keys as <strong>Cloudflare Worker Secrets</strong> (via <code>wrangler secret put</code>) and have your Worker make all API calls server-side — the keys never reach the browser at all. Your proxy Worker is already configured in this app, so that upgrade path is ready when you need it.
+          </div>
+        </div>
+
+        <!-- SCAN DEFAULTS -->
+        <div class="settings-card" id="sc-scan">
+          <div class="settings-card-title">🔍 Scan Defaults</div>
+          <div class="settings-card-desc">Pre-fill the scanner with your most-used settings so you don't have to re-enter them every session.</div>
+          <div class="settings-group">
+            <div class="settings-field">
+              <label>Default City / Area</label>
+              <input type="text" id="s-def-city" placeholder="e.g. Silver Spring, MD"/>
+            </div>
+            <div class="settings-field">
+              <label>Default Business Type</label>
+              <input type="text" id="s-def-type" placeholder="e.g. med spa, gym, dentist…"/>
+              <div class="settings-hint">Leave blank to default to searching all businesses.</div>
+            </div>
+            <div class="settings-field">
+              <label>Default Radius</label>
+              <select id="s-def-radius">
+                <option value="5000">5 km</option>
+                <option value="10000" selected>10 km</option>
+                <option value="20000">20 km</option>
+                <option value="50000">50 km</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-divider"></div>
+          <div style="margin-bottom:10px;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Scan Behaviour</div>
+          <div class="settings-row"><label><input type="checkbox" id="s-auto-filter-noweb"/> Auto-apply "No website first" sort after each scan</label></div>
+          <div class="settings-row"><label><input type="checkbox" id="s-auto-add-tracker"/> Auto-add all scan results to tracker</label></div>
+          <div style="margin-top:1rem;display:flex;align-items:center;gap:10px;">
+            <button class="btn btn-accent" onclick="saveScanDefaults()">💾 Save Defaults</button>
+            <span class="save-confirm" id="scan-saved-confirm">✓ Saved!</span>
+          </div>
+        </div>
+
+        <!-- BULK KEYWORDS -->
+        <div class="settings-card" id="sc-keywords">
+          <div class="settings-card-title">📋 Bulk Scan Keywords</div>
+          <div class="settings-card-desc">Searched in sequence during a Bulk Scan. Edit or add your own to target different business types.</div>
+          <div id="kw-edit-list" style="margin-bottom:1rem;"></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-accent" onclick="addKeyword()">+ Add keyword</button>
+            <button class="btn btn-sm btn-ghost" onclick="resetKeywords()">Reset to defaults</button>
+            <button class="btn btn-accent" onclick="saveKeywords()" style="margin-left:auto;">💾 Save Keywords</button>
+            <span class="save-confirm" id="kw-saved-confirm">✓ Saved!</span>
+          </div>
+        </div>
+
+        <!-- OUTREACH -->
+        <div class="settings-card" id="sc-outreach">
+          <div class="settings-card-title">✉️ Outreach Templates</div>
+          <div class="settings-card-desc">Save your outreach templates here as a reference. Use <code>{name}</code> and <code>{city}</code> as placeholders.</div>
+          <div class="settings-field" style="margin-bottom:1rem;">
+            <label>Email Subject Template</label>
+            <input type="text" id="s-email-subject" placeholder="e.g. Quick question about {name}'s online presence"/>
+          </div>
+          <div class="settings-field" style="margin-bottom:1rem;">
+            <label>Email Body Template</label>
+            <textarea id="s-email-body" rows="7" placeholder="Hi {name},&#10;&#10;I noticed your spa in {city} doesn't have a website..."></textarea>
+          </div>
+          <div class="settings-field" style="margin-bottom:1rem;">
+            <label>Your Name / Signature</label>
+            <input type="text" id="s-your-name" placeholder="e.g. Alex — Web Design for Med Spas"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-accent" onclick="saveOutreach()">💾 Save Templates</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyEmailTemplate()">📋 Copy email</button>
+            <span class="save-confirm" id="outreach-saved-confirm">✓ Saved!</span>
+          </div>
+        </div>
+
+        <!-- DATA MANAGEMENT -->
+        <div class="settings-card" id="sc-data">
+          <div class="settings-card-title">💾 Data Management</div>
+          <div class="settings-card-desc">Export or manage all data stored locally in your browser.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem;">
+            <button class="btn btn-success" onclick="exportCSV()">⬇ Export Leads CSV</button>
+            <button class="btn btn-ghost" onclick="exportSettingsJSON()">⬇ Export Settings JSON</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('import-json-input').click()">⬆ Import Settings JSON</button>
+            <input type="file" id="import-json-input" accept=".json" style="display:none;" onchange="handleImportJSON(this)"/>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:1.5rem;">
+            <strong style="color:var(--text);">Storage used:</strong> <span id="storage-used">—</span>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="danger-zone">
+            <div class="danger-zone-title">⚠ Danger Zone</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-danger btn-sm" onclick="clearLeadsData()">Clear all leads</button>
+              <button class="btn btn-danger btn-sm" onclick="clearScanResults()">Clear scan results</button>
+              <button class="btn btn-danger btn-sm" onclick="clearAllData()">Reset everything</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABOUT -->
+        <div class="settings-card" id="sc-about">
+          <div class="settings-card-title">ℹ️ About</div>
+          <div class="settings-card-desc">Med Spa Scanner — a lead generation tool for web designers targeting aesthetic clinics.</div>
+          <div style="background:var(--surface2);border-radius:var(--r-sm);padding:1rem;font-size:13px;margin-bottom:1rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.07em;">Version</span><br/>2.0.0</div>
+              <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.07em;">Storage</span><br/>Browser localStorage</div>
+              <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.07em;">AI Model</span><br/>Gemini 2.0 Flash</div>
+              <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.07em;">Proxy</span><br/>Cloudflare Worker</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+            <strong style="color:var(--text);">APIs used:</strong> Google Places API, Google Geocoding API, Gemini API.<br/>
+            All Google API calls route through your Cloudflare Worker proxy.<br/><br/>
+            <strong style="color:var(--text);">Keyboard shortcut:</strong> Press <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;">Enter</code> in the AI chat input to send.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- AI CHAT BUBBLE -->
@@ -517,11 +727,11 @@ td a:hover{text-decoration:underline;}
 
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const HARDCODED_PLACES_KEY = 'paste-your-places-key-here';
-const HARDCODED_GEMINI_KEY = 'paste-your-gemini-key-here';
 const PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
 const SK = 'mss_leads_v2';
-const BULK_KEYWORDS = ['med spa','botox clinic','laser hair removal','aesthetic clinic','skin rejuvenation','lip filler clinic'];
+const SK_SETTINGS = 'mss_settings_v1';
+const DEFAULT_BULK_KEYWORDS = ['med spa','botox clinic','laser hair removal','aesthetic clinic','skin rejuvenation','lip filler clinic'];
+let BULK_KEYWORDS = [...DEFAULT_BULK_KEYWORDS];
 const SERVICE_ICONS = ['✦','◈','◇','❋','◉','✿','❖','◆','✤','❀'];
 
 let leads = [], nextId = 1, scanResults = [], visibleResults = [];
@@ -545,30 +755,51 @@ function load(){
     if(d.services)customServices=d.services;
     if(d.svcNextId)svcNextId=d.svcNextId;}
   }catch(e){}
+  // Load settings / bulk keywords
+  try{
+    const s=JSON.parse(localStorage.getItem(SK_SETTINGS)||'null');
+    if(s&&s.bulkKeywords&&s.bulkKeywords.length)BULK_KEYWORDS=s.bulkKeywords;
+  }catch(e){}
 }
 function save(){try{localStorage.setItem(SK,JSON.stringify({leads,nextId,services:customServices,svcNextId}));}catch(e){}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ── KEYS ──────────────────────────────────────────────────────────────────────
-function getPlacesKey(){return document.getElementById('api-key').value.trim()||HARDCODED_PLACES_KEY;}
-function getGeminiKey(){return document.getElementById('gemini-key').value.trim()||HARDCODED_GEMINI_KEY;}
+function getPlacesKey(){return localStorage.getItem('mss_places_key')||'';}
+function getGeminiKey(){return localStorage.getItem('mss_gemini_key')||'';}
 function checkKey(){
   const pk=getPlacesKey(), gk=getGeminiKey();
-  const s=document.getElementById('key-status');
-  const pOk=pk&&pk!=='paste-your-places-key-here';
-  const gOk=gk&&gk!=='paste-your-gemini-key-here';
-  if(pOk&&gOk){s.textContent='Both keys active';s.className='key-status ok';}
-  else if(pOk){s.textContent='Places key active';s.className='key-status ok';}
-  else{s.textContent='No keys entered';s.className='key-status empty';}
+  const pOk=!!pk, gOk=!!gk;
+  // Topbar indicator
+  const tb=document.getElementById('topbar-key-status');
+  // Settings indicator
+  const sk=document.getElementById('settings-key-status');
+  if(pOk&&gOk){
+    if(tb){tb.textContent='✓ Keys active';tb.className='key-indicator ok';}
+    if(sk){sk.textContent='Both keys active';sk.className='key-indicator ok';}
+  }else if(pOk){
+    if(tb){tb.textContent='⚠ Gemini key missing';tb.className='key-indicator partial';}
+    if(sk){sk.textContent='Places key active';sk.className='key-indicator partial';}
+  }else{
+    if(tb){tb.textContent='⚠ Keys not set';tb.className='key-indicator empty';}
+    if(sk){sk.textContent='No keys set';sk.className='key-indicator empty';}
+  }
+  // Populate settings inputs with masked placeholders if keys exist
+  const pi=document.getElementById('s-places-key');
+  const gi=document.getElementById('s-gemini-key');
+  if(pi&&!pi.value&&pk)pi.placeholder='(key saved — enter new to replace)';
+  if(gi&&!gi.value&&gk)gi.placeholder='(key saved — enter new to replace)';
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['scanner','tracker','demo'][i]===t));
+  const tabs=['scanner','tracker','demo','settings'];
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',tabs[i]===t));
   document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
   document.getElementById('panel-'+t).classList.add('active');
   if(t==='tracker')renderTracker();
   if(t==='demo')renderServiceList();
+  if(t==='settings'){loadSettingsUI();updateStorageUsed();}
 }
 
 // ── ERROR ─────────────────────────────────────────────────────────────────────
@@ -583,7 +814,9 @@ async function geocode(city,key){
   return d.results[0].geometry.location;
 }
 async function placesSearch(lat,lng,radius,kw,key){
-  const r=await fetch(proxied(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&keyword=${encodeURIComponent(kw)}&key=${key}`));
+  const base=`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&key=${key}`;
+  const url=kw?base+`&keyword=${encodeURIComponent(kw)}`:base+`&type=establishment`;
+  const r=await fetch(proxied(url));
   return r.json();
 }
 async function getDetails(pid,key){
@@ -664,8 +897,15 @@ function renderCards(places){
     const inT=leads.some(l=>l.name===p.name);
     const stars='★'.repeat(Math.round(p.rating||0))+'☆'.repeat(5-Math.round(p.rating||0));
     const city=(p.address||'').split(',')[1]||'';
+    // AI relevance badge
+    let aiBadge='';
+    if(p.aiScore!==null&&p.aiScore!==undefined){
+      const cls=p.aiScore>=70?'ai-rel-high':p.aiScore>=40?'ai-rel-mid':'ai-rel-low';
+      const lbl=p.aiScore>=70?'✦ Great match':p.aiScore>=40?'~ Possible match':'✗ Low match';
+      aiBadge=`<span class="ai-rel-badge ${cls}" title="${esc(p.aiReason||'')}">${lbl} ${p.aiScore}</span>`;
+    }
     return `<div class="result-card${inT?' added':''}" id="rc-${gi}">
-      <div class="rc-header"><div class="rc-name">${esc(p.name)}</div><div class="rc-rating">${stars} <span>(${p.reviews||0})</span></div></div>
+      <div class="rc-header"><div class="rc-name">${esc(p.name)}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="rc-rating">${stars} <span>(${p.reviews||0})</span></div>${aiBadge}</div></div>
       <div class="rc-row">${esc(city.trim())}</div>
       <div class="rc-row">${p.phone?`<a href="tel:${esc(p.phone)}">${esc(p.phone)}</a>`:'<span style="color:var(--danger)">No phone</span>'}</div>
       <div class="rc-row">${p.website?`<a href="${esc(p.website)}" target="_blank">${esc(p.website.replace(/https?:\/\//,'').split('/')[0])}</a>`:'<span style="color:var(--danger)">No website</span>'}</div>
@@ -683,10 +923,11 @@ function renderCards(places){
 // ── SCAN ──────────────────────────────────────────────────────────────────────
 async function runScan(){
   const key=getPlacesKey();
-  if(!key||key==='paste-your-places-key-here'){showError('Please enter your Google Places API key.');return;}
+  if(!key){showError('Please enter your Google Places API key in ⚙ Settings → API Keys.');switchTab('settings');return;}
   const city=document.getElementById('s-city').value.trim();
   if(!city){showError('Enter a city or area to search.');return;}
-  const kw=document.getElementById('s-type').value;
+  closeSuggestions();
+  const kw=document.getElementById('s-type').value.trim();
   const radius=document.getElementById('s-radius').value;
   document.getElementById('loader').classList.add('active');
   document.getElementById('loader-msg').textContent='Finding location...';
@@ -695,32 +936,158 @@ async function runScan(){
   document.getElementById('scan-actions').style.display='none';
   document.getElementById('error-msg').classList.remove('show');
   document.getElementById('filter-bar').classList.remove('show');
+  document.getElementById('ai-filter-bar').classList.remove('show');
   document.getElementById('result-count').style.display='none';
   try{
     const loc=await geocode(city,key);
-    document.getElementById('loader-msg').textContent=`Scanning for "${kw}" near ${city}...`;
+    const label=kw||'businesses';
+    document.getElementById('loader-msg').textContent=`Scanning for ${label} near ${city}...`;
     const data=await placesSearch(loc.lat,loc.lng,radius,kw,key);
     if(data.status==='REQUEST_DENIED')throw new Error('API key rejected. Check Places API and Geocoding API are enabled.');
     if(data.status==='ZERO_RESULTS'||!data.results?.length){document.getElementById('loader').classList.remove('active');document.getElementById('scan-empty').classList.add('show');return;}
     document.getElementById('loader-msg').textContent=`Loading details for ${data.results.length} businesses...`;
     const detailed=await Promise.all(data.results.slice(0,20).map(async p=>{
-      try{const det=await getDetails(p.place_id,key);return{name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
-      catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
+      try{const det=await getDetails(p.place_id,key);return{name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
+      catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
     }));
     scanResults=detailed;visibleResults=detailed;
     document.getElementById('loader').classList.remove('active');
     document.getElementById('filter-bar').classList.add('show');
     clearFilters();
+    // Run AI relevance scoring if a search type was entered and Gemini key exists
+    if(kw&&getGeminiKey()){
+      aiScoreResults(kw,detailed);
+    }
   }catch(e){
     document.getElementById('loader').classList.remove('active');
     showError(e.message||'Something went wrong. Check your API key and try again.');
   }
 }
 
+// ── AI RELEVANCE SCORING ──────────────────────────────────────────────────────
+async function aiScoreResults(searchType,results){
+  const gk=getGeminiKey();
+  if(!gk||!results.length)return;
+  const bar=document.getElementById('ai-filter-bar');
+  const msg=document.getElementById('ai-filter-msg');
+  const spinner=document.getElementById('ai-filter-spinner');
+  bar.classList.add('show');
+  spinner.style.display='block';
+  msg.textContent=`AI is scoring ${results.length} results for "${searchType}" relevance…`;
+
+  const list=results.map((p,i)=>`${i}: name="${p.name}" rating=${p.rating} reviews=${p.reviews} address="${p.address}"`).join('\n');
+  const prompt=`You are a business relevance scorer. The user searched for: "${searchType}".
+
+For each business below, score its relevance from 0-100 based ONLY on:
+1. Business name (does it sound like a "${searchType}"?)
+2. Rating and review count as a quality signal
+3. Address context if helpful
+
+Return ONLY a JSON array with one object per business in the same order:
+[{"index":0,"score":85,"reason":"Clearly a med spa based on name"},...]
+
+Be generous with scores when the name is ambiguous — score 50+ if it could plausibly be relevant.
+Score < 30 only if the business is clearly unrelated (e.g. a restaurant when searching "gym").
+
+Businesses:
+${list}`;
+
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gk}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+    });
+    const d=await res.json();
+    const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'[]';
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const scores=JSON.parse(clean);
+    scores.forEach(s=>{
+      if(scanResults[s.index]){
+        scanResults[s.index].aiScore=s.score;
+        scanResults[s.index].aiReason=s.reason||'';
+      }
+    });
+    // Sort visible results by AI score descending
+    visibleResults=[...scanResults].sort((a,b)=>(b.aiScore||0)-(a.aiScore||0));
+    scanResults=[...visibleResults]; // keep scan order matched
+
+    const highCount=scores.filter(s=>s.score>=70).length;
+    spinner.style.display='none';
+    msg.innerHTML=`✦ AI scored all results — <strong>${highCount} highly relevant</strong> to "${searchType}", sorted by match quality. <button class="btn btn-ghost btn-sm" style="padding:2px 9px;font-size:11px;" onclick="clearAiScores()">Clear AI scores</button>`;
+    renderCards(visibleResults);
+  }catch(e){
+    spinner.style.display='none';
+    msg.textContent='AI scoring unavailable — showing all results.';
+    setTimeout(()=>bar.classList.remove('show'),3000);
+  }
+}
+
+function clearAiScores(){
+  scanResults.forEach(p=>{p.aiScore=null;p.aiReason='';});
+  visibleResults=[...scanResults];
+  document.getElementById('ai-filter-bar').classList.remove('show');
+  renderCards(visibleResults);
+}
+
+// ── SEARCH TYPE SUGGESTIONS ───────────────────────────────────────────────────
+const TYPE_SUGGESTIONS={
+  'Aesthetics & Wellness':['Med spa','Botox clinic','Aesthetic clinic','Laser hair removal','Skin rejuvenation','Lip filler clinic','Dermatology','Plastic surgery','Weight loss clinic','IV therapy'],
+  'Fitness & Health':['Gym','Yoga studio','Pilates studio','CrossFit','Personal trainer','Martial arts','Dance studio','Swimming pool','Rock climbing'],
+  'Beauty & Grooming':['Hair salon','Nail salon','Barbershop','Eyelash studio','Brow bar','Waxing salon','Tanning salon','Makeup artist'],
+  'Dental & Medical':['Dentist','Orthodontist','Chiropractor','Physical therapy','Optometrist','Mental health clinic','Urgent care'],
+  'Food & Drink':['Restaurant','Cafe','Coffee shop','Bar','Bakery','Food truck','Juice bar'],
+  'Home & Services':['Plumber','Electrician','HVAC','Landscaping','Cleaning service','Real estate','Interior design'],
+};
+let sugIndex=-1;
+
+function showTypeSuggestions(val){
+  const box=document.getElementById('type-suggestions');
+  const q=(val||'').toLowerCase().trim();
+  let html='';
+  if(!q){
+    // Show all categories
+    for(const [cat,items] of Object.entries(TYPE_SUGGESTIONS)){
+      html+=`<div class="type-sug-group">${cat}</div>`;
+      html+=items.map(it=>`<div class="type-sug-item" onmousedown="pickSuggestion('${it}')">${it}</div>`).join('');
+    }
+  } else {
+    // Filter across all
+    const matches=[];
+    for(const items of Object.values(TYPE_SUGGESTIONS))items.forEach(it=>{if(it.toLowerCase().includes(q))matches.push(it);});
+    if(matches.length)html=matches.map(it=>`<div class="type-sug-item" onmousedown="pickSuggestion('${it}')">${it}</div>`).join('');
+    else html=`<div class="type-sug-item" style="color:var(--muted);pointer-events:none;">Type anything — press Scan to search</div>`;
+  }
+  box.innerHTML=html;
+  box.classList.add('open');
+  sugIndex=-1;
+}
+
+function pickSuggestion(val){
+  document.getElementById('s-type').value=val;
+  closeSuggestions();
+}
+
+function closeSuggestions(){
+  document.getElementById('type-suggestions').classList.remove('open');
+  sugIndex=-1;
+}
+
+function typeSugKeydown(e){
+  const box=document.getElementById('type-suggestions');
+  const items=box.querySelectorAll('.type-sug-item[onmousedown]');
+  if(e.key==='ArrowDown'){e.preventDefault();sugIndex=Math.min(sugIndex+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('active',i===sugIndex));}
+  else if(e.key==='ArrowUp'){e.preventDefault();sugIndex=Math.max(sugIndex-1,0);items.forEach((el,i)=>el.classList.toggle('active',i===sugIndex));}
+  else if(e.key==='Enter'){if(sugIndex>=0&&items[sugIndex]){e.preventDefault();pickSuggestion(items[sugIndex].textContent);}else{closeSuggestions();runScan();}}
+  else if(e.key==='Escape'){closeSuggestions();}
+}
+
+// Close suggestions on outside click
+document.addEventListener('click',e=>{if(!e.target.closest('.search-type-wrap'))closeSuggestions();});
+
 // ── BULK SCAN ────────────────────────────────────────────────────────────────
 async function runBulkScan(){
   const key=getPlacesKey();
-  if(!key||key==='paste-your-places-key-here'){showError('Please enter your Google Places API key.');return;}
+  if(!key){showError('Please enter your Google Places API key in ⚙ Settings → API Keys.');switchTab('settings');return;}
   const city=document.getElementById('s-city').value.trim();
   if(!city){showError('Enter a city or area to search.');return;}
   const radius=document.getElementById('s-radius').value;
@@ -895,7 +1262,7 @@ async function pasteAutoFill(){
   const text=document.getElementById('paste-box').value.trim();
   if(!text){addAIMsg('assistant','Please paste some spa information in the box first.');return;}
   const gk=getGeminiKey();
-  if(!gk||gk==='paste-your-gemini-key-here'){addAIMsg('assistant','Please enter your Gemini API key to use auto-fill.');toggleAI();return;}
+  if(!gk){addAIMsg('assistant','Please add your Gemini API key in ⚙ Settings → API Keys.');switchTab('settings');return;}
   addAIMsg('assistant','Reading the pasted info and filling the form...');
   const prompt=`Extract spa business details from this text and return ONLY valid JSON, no markdown, no explanation:
 {"name":"","tagline":"","city":"","phone":"","email":"","address":"","services":[{"name":"","price":"","unit":""}]}
@@ -1145,7 +1512,7 @@ async function sendAI(msg){
   addAIMsg('user',msg);
   const thinking=addAIMsg('assistant thinking','Thinking...');
   const gk=getGeminiKey();
-  if(!gk||gk==='paste-your-gemini-key-here'){thinking.textContent='Please enter your Gemini API key in the key bar at the top.';thinking.className='ai-msg assistant';return;}
+  if(!gk){thinking.textContent='Please add your Gemini API key in ⚙ Settings → API Keys.';thinking.className='ai-msg assistant';switchTab('settings');return;}
 
   // Build app state context
   const state={
@@ -1173,6 +1540,7 @@ Available actions (return as JSON array):
 - {"action":"fillDemo","index":0} — fill demo form from scan result at index
 - {"action":"setScanCity","city":"..."} — set the scan city input
 - {"action":"setScanRadius","radius":"5000"|"10000"|"20000"|"50000"}
+- {"action":"setScanType","type":"..."} — set the business type (empty string = all businesses)
 - {"action":"runScan"} — trigger a scan
 - {"action":"runBulkScan"} — trigger bulk scan
 - {"action":"exportCSV"}
@@ -1208,6 +1576,7 @@ No markdown, no explanation outside the JSON.`;
         case 'fillDemo': fillDemoFromResult(act.index);break;
         case 'setScanCity': document.getElementById('s-city').value=act.city;break;
         case 'setScanRadius': document.getElementById('s-radius').value=act.radius;break;
+        case 'setScanType': document.getElementById('s-type').value=act.type||'';break;
         case 'runScan': runScan();break;
         case 'runBulkScan': runBulkScan();break;
         case 'exportCSV': exportCSV();break;
@@ -1220,8 +1589,166 @@ No markdown, no explanation outside the JSON.`;
   }
 }
 
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function showSettingsSection(name){
+  document.querySelectorAll('.settings-nav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.settings-card').forEach(el=>el.classList.remove('active'));
+  // find the nav item that calls this name
+  document.querySelectorAll('.settings-nav-item').forEach(el=>{if(el.getAttribute('onclick').includes("'"+name+"'"))el.classList.add('active');});
+  const card=document.getElementById('sc-'+name);
+  if(card)card.classList.add('active');
+  if(name==='keywords')renderKeywordEditor();
+  if(name==='data')updateStorageUsed();
+}
+
+function loadSettingsUI(){
+  // API keys — show placeholder if key already saved
+  const pk=localStorage.getItem('mss_places_key')||'';
+  const gk=localStorage.getItem('mss_gemini_key')||'';
+  const pi=document.getElementById('s-places-key');
+  const gi=document.getElementById('s-gemini-key');
+  if(pi){pi.value='';pi.placeholder=pk?'(key saved — enter new to replace)':'AIzaSy...';}
+  if(gi){gi.value='';gi.placeholder=gk?'(key saved — enter new to replace)':'AIzaSy...';}
+
+  // Scan defaults
+  try{
+    const s=JSON.parse(localStorage.getItem(SK_SETTINGS)||'{}');
+    if(s.defaultCity)document.getElementById('s-def-city').value=s.defaultCity;
+    if(s.defaultType){const el=document.getElementById('s-def-type');if(el)el.value=s.defaultType;}
+    if(s.defaultRadius){const el=document.getElementById('s-def-radius');if(el)el.value=s.defaultRadius;}
+    if(s.autoFilterNoWeb!=null)document.getElementById('s-auto-filter-noweb').checked=!!s.autoFilterNoWeb;
+    if(s.autoAddTracker!=null)document.getElementById('s-auto-add-tracker').checked=!!s.autoAddTracker;
+    // Outreach
+    if(s.emailSubject)document.getElementById('s-email-subject').value=s.emailSubject;
+    if(s.emailBody)document.getElementById('s-email-body').value=s.emailBody;
+    if(s.yourName)document.getElementById('s-your-name').value=s.yourName;
+  }catch(e){}
+  checkKey();
+}
+
+function saveApiKeys(){
+  const pi=document.getElementById('s-places-key');
+  const gi=document.getElementById('s-gemini-key');
+  if(pi.value.trim())localStorage.setItem('mss_places_key',pi.value.trim());
+  if(gi.value.trim())localStorage.setItem('mss_gemini_key',gi.value.trim());
+  pi.value='';gi.value='';
+  const pk=localStorage.getItem('mss_places_key')||'';
+  const gk=localStorage.getItem('mss_gemini_key')||'';
+  pi.placeholder=pk?'(key saved — enter new to replace)':'AIzaSy...';
+  gi.placeholder=gk?'(key saved — enter new to replace)':'AIzaSy...';
+  checkKey();
+  flashConfirm('keys-saved-confirm');
+  // Apply scan defaults that depend on keys being present
+  applyScanDefaultsToUI();
+}
+
+function toggleKeyVisibility(){
+  ['s-places-key','s-gemini-key'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.type=el.type==='password'?'text':'password';
+  });
+}
+
+function getSettings(){
+  try{return JSON.parse(localStorage.getItem(SK_SETTINGS)||'{}');}catch(e){return {};}
+}
+function putSettings(obj){
+  const cur=getSettings();
+  localStorage.setItem(SK_SETTINGS,JSON.stringify({...cur,...obj}));
+}
+
+function saveScanDefaults(){
+  putSettings({
+    defaultCity:document.getElementById('s-def-city').value.trim(),
+    defaultType:document.getElementById('s-def-type').value,
+    defaultRadius:document.getElementById('s-def-radius').value,
+    autoFilterNoWeb:document.getElementById('s-auto-filter-noweb').checked,
+    autoAddTracker:document.getElementById('s-auto-add-tracker').checked,
+  });
+  applyScanDefaultsToUI();
+  flashConfirm('scan-saved-confirm');
+}
+
+function applyScanDefaultsToUI(){
+  const s=getSettings();
+  if(s.defaultCity){const el=document.getElementById('s-city');if(el&&!el.value)el.value=s.defaultCity;}
+  if(s.defaultType){const el=document.getElementById('s-type');if(el)el.value=s.defaultType;}
+  if(s.defaultRadius){const el=document.getElementById('s-radius');if(el)el.value=s.defaultRadius;}
+}
+
+// ── KEYWORD EDITOR ────────────────────────────────────────────────────────────
+function renderKeywordEditor(){
+  document.getElementById('kw-edit-list').innerHTML=BULK_KEYWORDS.map((kw,i)=>`
+    <div class="kw-edit-row">
+      <span class="kw-num">${i+1}</span>
+      <input value="${esc(kw)}" oninput="BULK_KEYWORDS[${i}]=this.value" placeholder="keyword"/>
+      <button class="svc-del" onclick="removeKeyword(${i})" title="Remove">×</button>
+    </div>`).join('');
+}
+function addKeyword(){BULK_KEYWORDS.push('');renderKeywordEditor();const rows=document.querySelectorAll('.kw-edit-row');if(rows.length){rows[rows.length-1].querySelector('input').focus();}}
+function removeKeyword(i){BULK_KEYWORDS.splice(i,1);renderKeywordEditor();}
+function resetKeywords(){BULK_KEYWORDS=[...DEFAULT_BULK_KEYWORDS];renderKeywordEditor();}
+function saveKeywords(){
+  BULK_KEYWORDS=BULK_KEYWORDS.filter(k=>k.trim());
+  putSettings({bulkKeywords:BULK_KEYWORDS});
+  renderKeywordEditor();
+  flashConfirm('kw-saved-confirm');
+}
+
+// ── OUTREACH ──────────────────────────────────────────────────────────────────
+function saveOutreach(){
+  putSettings({
+    emailSubject:document.getElementById('s-email-subject').value,
+    emailBody:document.getElementById('s-email-body').value,
+    yourName:document.getElementById('s-your-name').value,
+  });
+  flashConfirm('outreach-saved-confirm');
+}
+function copyEmailTemplate(){
+  const s=getSettings();
+  const sub=s.emailSubject||'';
+  const body=s.emailBody||'';
+  const sig=s.yourName?'\n\n'+s.yourName:'';
+  navigator.clipboard.writeText('Subject: '+sub+'\n\n'+body+sig).then(()=>{
+    const btn=event.target;const orig=btn.textContent;btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent=orig,2000);
+  }).catch(()=>alert('Could not copy. Try selecting and copying manually.'));
+}
+
+// ── DATA MANAGEMENT ───────────────────────────────────────────────────────────
+function updateStorageUsed(){
+  try{
+    let total=0;
+    for(const k of Object.keys(localStorage)){if(k.startsWith('mss_'))total+=localStorage.getItem(k).length;}
+    const kb=(total/1024).toFixed(1);
+    document.getElementById('storage-used').textContent=kb+' KB of ~5 MB localStorage quota';
+  }catch(e){document.getElementById('storage-used').textContent='unknown';}
+}
+function exportSettingsJSON(){
+  const data={settings:getSettings(),exported:new Date().toISOString()};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='medspa_settings.json';a.click();
+}
+function importSettingsJSON(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.settings){localStorage.setItem(SK_SETTINGS,JSON.stringify(data.settings));loadSettingsUI();alert('Settings imported successfully!');}
+      else alert('Invalid settings file.');
+    }catch(err){alert('Could not parse JSON file.');}
+    input.value='';
+  };
+  r.readAsText(file);
+}
+function clearLeadsData(){if(!confirm('Delete ALL leads? This cannot be undone.'))return;leads=[];nextId=1;save();renderTracker();updateTrackerCount();updateStorageUsed();alert('All leads cleared.');}
+function clearScanResults(){scanResults=[];visibleResults=[];document.getElementById('scan-results').innerHTML='';document.getElementById('scan-empty').classList.add('show');document.getElementById('filter-bar').classList.remove('show');document.getElementById('scan-actions').style.display='none';updateStorageUsed();alert('Scan results cleared.');}
+function clearAllData(){if(!confirm('Reset EVERYTHING — leads, settings, keys? This cannot be undone.'))return;['mss_leads_v2','mss_settings_v1','mss_places_key','mss_gemini_key'].forEach(k=>localStorage.removeItem(k));leads=[];nextId=1;scanResults=[];visibleResults=[];BULK_KEYWORDS=[...DEFAULT_BULK_KEYWORDS];save();renderTracker();updateTrackerCount();loadSettingsUI();checkKey();updateStorageUsed();alert('All data cleared.');}
+
+// ── UTILITY ───────────────────────────────────────────────────────────────────
+function flashConfirm(id){const el=document.getElementById(id);if(!el)return;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
-load();renderTracker();updateTrackerCount();renderServiceList();checkKey();
+load();renderTracker();updateTrackerCount();renderServiceList();checkKey();applyScanDefaultsToUI();
 </script>
 </body>
 </html>
