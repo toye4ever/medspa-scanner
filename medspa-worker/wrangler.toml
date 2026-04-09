@@ -1,0 +1,23 @@
+# Med Spa Scanner — Cloudflare Worker Config
+# ─────────────────────────────────────────────
+# Rename this file to wrangler.toml and fill in your account ID.
+# Run: npx wrangler deploy
+
+name            = "medspa-scanner-api"
+main            = "worker.js"
+compatibility_date = "2024-09-01"
+
+# ── Optional: pin to a specific Cloudflare zone ────────────────────────────
+# routes = [{ pattern = "api.yourdomain.com/*", zone_name = "yourdomain.com" }]
+
+# ── Secrets (DO NOT put real keys here — set via CLI instead) ──────────────
+# Run these two commands after deploying:
+#
+#   npx wrangler secret put PLACES_KEY
+#   npx wrangler secret put GEMINI_KEY
+#
+# Wrangler will prompt you to paste the value securely.
+# Secrets are encrypted and never appear in source code or logs.
+
+[observability]
+enabled = true
