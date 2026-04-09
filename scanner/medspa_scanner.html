@@ -320,6 +320,131 @@ td a:hover{text-decoration:underline;}
 .type-sug-item:last-child{border-bottom:none;}
 .type-sug-item:hover,.type-sug-item.active{background:var(--surface3);color:var(--accent);}
 .type-sug-group{padding:5px 12px 3px;font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;background:var(--surface);}
+
+/* ── CALL SCRIPT ─────────────────────────────────────────────────────────── */
+.cs-layout{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;}
+.cs-main{display:flex;flex-direction:column;gap:1.25rem;}
+.cs-sidebar{display:flex;flex-direction:column;gap:1.25rem;}
+.cs-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;}
+.cs-card-title{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:500;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+
+/* Stage pills */
+.cs-stages{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.cs-stage-btn{background:var(--surface2);border:0.5px solid var(--border2);border-radius:20px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:5px 14px;cursor:pointer;transition:all 0.15s;}
+.cs-stage-btn:hover{border-color:var(--border3);color:var(--text);}
+.cs-stage-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text);}
+.cs-script{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:1.1rem 1.25rem;font-size:14px;line-height:1.9;color:var(--text);}
+.cs-script .cs-you{color:var(--accent);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:6px;}
+.cs-script p{margin-bottom:0.75rem;}
+.cs-script p:last-child{margin-bottom:0;}
+.cs-highlight{background:rgba(212,247,78,0.12);border-radius:3px;padding:1px 4px;}
+
+/* ── LIVE TRANSCRIPT ─────────────────────────────────────────────────────── */
+.cs-transcript-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;position:relative;}
+.cs-mic-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.cs-mic-btn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:0.5px solid;transition:all 0.2s;}
+.cs-mic-btn.idle{background:var(--accent);border-color:var(--accent);color:var(--accent-text);}
+.cs-mic-btn.idle:hover{opacity:0.88;}
+.cs-mic-btn.listening{background:var(--danger-dim);border-color:var(--danger);color:var(--danger);animation:mic-pulse 1.5s ease infinite;}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(248,96,96,0.3);}50%{box-shadow:0 0 0 6px rgba(248,96,96,0);}}
+.cs-mic-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.cs-mic-dot.listening{animation:blink 1s ease infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.cs-mic-status{font-size:12px;color:var(--muted);margin-left:auto;}
+.cs-mic-status.on{color:var(--danger);}
+.cs-transcript-scroll{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px;}
+.cs-transcript-scroll::-webkit-scrollbar{width:3px;}
+.cs-transcript-scroll::-webkit-scrollbar-track{background:transparent;}
+.cs-transcript-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.cs-tx-line{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.6;}
+.cs-tx-speaker{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;margin-top:3px;padding:2px 7px;border-radius:20px;flex-shrink:0;}
+.cs-tx-you{background:var(--accent-dim);color:var(--accent);}
+.cs-tx-interim{color:var(--muted2);font-style:italic;}
+.cs-tx-empty{text-align:center;padding:2rem 1rem;color:var(--muted2);font-size:13px;}
+
+/* ── AI OBJECTION HANDLER ────────────────────────────────────────────────── */
+.cs-obj-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;transition:border-color 0.3s;}
+.cs-obj-card.alert{border-color:rgba(248,200,96,0.5);background:rgba(248,200,96,0.03);}
+.cs-obj-idle{text-align:center;padding:1.5rem 1rem;color:var(--muted2);font-size:13px;}
+.cs-obj-idle-icon{font-size:24px;margin-bottom:8px;}
+.cs-obj-detected{display:none;}
+.cs-obj-detected.show{display:block;}
+.cs-obj-detected-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;color:var(--warn);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.cs-obj-detected-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--warn);flex-shrink:0;animation:blink 1s ease infinite;}
+.cs-obj-text{background:var(--warn-dim);border:0.5px solid rgba(248,200,96,0.3);border-radius:var(--r-sm);padding:9px 13px;font-size:13px;color:var(--warn);font-weight:500;margin-bottom:12px;line-height:1.5;}
+.cs-obj-response-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;color:var(--accent);margin-bottom:6px;}
+.cs-obj-response-box{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:12px 14px;font-size:13px;line-height:1.8;color:var(--text);position:relative;}
+.cs-obj-copy-btn{position:absolute;top:8px;right:8px;background:var(--surface3);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--muted);font-size:11px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.cs-obj-copy-btn:hover{color:var(--accent);border-color:var(--accent);}
+.cs-obj-history{margin-top:12px;border-top:0.5px solid var(--border);padding-top:10px;}
+.cs-obj-history-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.cs-obj-hist-item{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:6px;}
+.cs-obj-hist-item:last-child{border-bottom:none;}
+.cs-obj-hist-item::before{content:'↳';color:var(--muted2);flex-shrink:0;}
+.cs-obj-thinking{display:none;align-items:center;gap:8px;font-size:12px;color:var(--accent);padding:8px 0;}
+.cs-obj-thinking.show{display:flex;}
+.cs-obj-spin{width:12px;height:12px;border:1.5px solid rgba(212,247,78,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+
+/* ── MEETING INTEL ───────────────────────────────────────────────────────── */
+.cs-intel-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;}
+.cs-intel-section{margin-bottom:12px;}
+.cs-intel-section:last-child{margin-bottom:0;}
+.cs-intel-label{font-size:10px;text-transform:uppercase;letter-spacing:0.09em;font-weight:600;margin-bottom:5px;}
+.cs-intel-label.pain{color:var(--danger);}
+.cs-intel-label.interest{color:var(--success);}
+.cs-intel-label.context{color:var(--info);}
+.cs-intel-label.suggest{color:var(--accent);}
+.cs-intel-items{display:flex;flex-direction:column;gap:3px;}
+.cs-intel-item{font-size:12px;color:var(--text);padding:4px 8px;background:var(--surface2);border-radius:var(--r-sm);line-height:1.5;display:flex;gap:6px;align-items:flex-start;}
+.cs-intel-item::before{flex-shrink:0;margin-top:1px;}
+.cs-intel-item.pain::before{content:'⚠';font-size:10px;}
+.cs-intel-item.interest::before{content:'✓';font-size:10px;color:var(--success);}
+.cs-intel-item.context::before{content:'ℹ';font-size:10px;color:var(--info);}
+.cs-intel-item.suggest::before{content:'→';font-size:10px;color:var(--accent);}
+.cs-intel-empty{font-size:12px;color:var(--muted2);text-align:center;padding:1rem 0;}
+.cs-intel-thinking{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:5px;padding:4px 0;}
+
+/* Timer */
+.cs-timer-display{font-family:'Syne',sans-serif;font-size:44px;font-weight:700;letter-spacing:-2px;color:var(--text);line-height:1;margin-bottom:1rem;text-align:center;}
+.cs-timer-display.warn{color:var(--warn);}
+.cs-timer-display.over{color:var(--danger);}
+.cs-timer-btns{display:flex;gap:8px;justify-content:center;}
+
+/* Lead selector */
+.cs-lead-select{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;width:100%;margin-bottom:10px;transition:border-color 0.15s;}
+.cs-lead-select:focus{border-color:var(--accent);}
+.cs-lead-select option{background:var(--surface2);}
+.cs-lead-info{background:var(--surface2);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.8;display:none;}
+.cs-lead-info.show{display:block;}
+.cs-lead-info strong{color:var(--text);font-weight:500;}
+
+/* Note field */
+.cs-note{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:70px;line-height:1.6;transition:border-color 0.15s;}
+.cs-note:focus{border-color:var(--accent);}
+.cs-note::placeholder{color:var(--muted2);}
+
+/* Outcome buttons */
+.cs-outcomes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.cs-outcome-btn{padding:10px;border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid;transition:all 0.15s;text-align:center;}
+.cs-outcome-btn:active{transform:scale(0.97);}
+.cs-outcome-interested{background:var(--success-dim);border-color:var(--success);color:var(--success);}
+.cs-outcome-interested:hover{background:var(--success);color:var(--accent-text);}
+.cs-outcome-callback{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.cs-outcome-callback:hover{background:var(--warn);color:var(--accent-text);}
+.cs-outcome-notinterested{background:var(--danger-dim);border-color:var(--danger);color:var(--danger);}
+.cs-outcome-notinterested:hover{background:var(--danger);color:white;}
+.cs-outcome-voicemail{background:var(--surface2);border-color:var(--border2);color:var(--muted);}
+.cs-outcome-voicemail:hover{background:var(--surface3);color:var(--text);}
+.cs-outcome-flash{display:none;text-align:center;padding:8px;border-radius:var(--r-sm);font-size:13px;font-weight:500;margin-top:8px;}
+.cs-outcome-flash.show{display:block;}
+
+/* Tips */
+.cs-tip{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6;}
+.cs-tip:last-child{border-bottom:none;}
+.cs-tip-icon{flex-shrink:0;color:var(--accent);}
+
+@media(max-width:860px){.cs-layout{grid-template-columns:1fr;}}
+
 </style>
 </head>
 <body>
@@ -337,6 +462,7 @@ td a:hover{text-decoration:underline;}
         <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
         <button class="tab" onclick="switchTab('demo')">Demo Builder</button>
         <button class="tab" onclick="switchTab('settings')">⚙ Settings</button>
+      <button class="tab" onclick="switchTab('callscript')">📞 Call Script</button>
       </div>
     </div>
   </div>
@@ -540,7 +666,8 @@ td a:hover{text-decoration:underline;}
   <div class="panel" id="panel-settings">
     <div class="settings-layout">
       <nav class="settings-nav">
-        <button class="settings-nav-item active" onclick="showSettingsSection('keys')"><span class="sni">🔑</span> API Keys</button>
+        <button class="settings-nav-item active" onclick="showSettingsSection('worker')"><span class="sni">☁️</span> Cloudflare</button>
+        <button class="settings-nav-item" onclick="showSettingsSection('keys')"><span class="sni">🔑</span> API Keys</button>
         <button class="settings-nav-item" onclick="showSettingsSection('scan')"><span class="sni">🔍</span> Scan Defaults</button>
         <button class="settings-nav-item" onclick="showSettingsSection('keywords')"><span class="sni">📋</span> Bulk Keywords</button>
         <button class="settings-nav-item" onclick="showSettingsSection('outreach')"><span class="sni">✉️</span> Outreach</button>
@@ -549,10 +676,45 @@ td a:hover{text-decoration:underline;}
       </nav>
       <div class="settings-content">
 
-        <!-- API KEYS -->
-        <div class="settings-card active" id="sc-keys">
-          <div class="settings-card-title">🔑 API Keys</div>
-          <div class="settings-card-desc">Enter your API keys once — they're saved in your browser's localStorage and never hardcoded in the app source.</div>
+        <!-- CLOUDFLARE WORKER -->
+        <div class="settings-card active" id="sc-worker">
+          <div class="settings-card-title">☁️ Cloudflare Worker</div>
+          <div class="settings-card-desc">Connect your Worker to route <strong>all API calls server-side</strong> — your Google and Gemini keys never touch the browser. This is the most secure setup.</div>
+
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:flex-end;margin-bottom:1rem;">
+            <div class="settings-field">
+              <label>Worker URL</label>
+              <input type="url" id="s-worker-url" placeholder="https://medspa-scanner-api.yourname.workers.dev"/>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <label style="font-size:11px;color:transparent;">.</label>
+              <button class="btn btn-accent" onclick="saveWorkerUrl()">Save</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="testWorker()">🔍 Test connection</button>
+            <button class="btn btn-danger btn-sm" onclick="clearWorkerUrl()">Remove Worker</button>
+            <span class="save-confirm" id="worker-saved-confirm">✓ Worker URL saved!</span>
+            <div id="settings-worker-status" class="key-indicator empty" style="margin-left:auto;">No worker</div>
+          </div>
+
+          <div id="worker-test-result" style="display:none;background:var(--surface2);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;margin-bottom:1rem;line-height:1.8;font-family:'DM Mono',monospace;"></div>
+
+          <!-- Security comparison -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+            <div style="background:var(--success-dim);border:0.5px solid rgba(96,248,168,0.2);border-radius:var(--r-sm);padding:10px 12px;">
+              <div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">☁️ With Worker</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.7;">✓ Keys stored as encrypted secrets<br/>✓ Never sent to the browser<br/>✓ Can't be stolen via DevTools<br/>✓ Rate-limiting at edge level</div>
+            </div>
+            <div style="background:var(--warn-dim);border:0.5px solid rgba(248,200,96,0.2);border-radius:var(--r-sm);padding:10px 12px;">
+              <div style="font-size:11px;font-weight:600;color:var(--warn);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">🔑 Browser Keys Only</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.7;">⚠ Keys in localStorage<br/>⚠ Visible in DevTools<br/>⚠ Fine for personal use<br/>⚠ Risk if shared publicly</div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-card" id="sc-keys">
+          <div class="settings-card-title">🔑 Browser API Keys <span style="font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">(fallback — use Worker for best security)</span></div>
+          <div class="settings-card-desc">If you're not using a Cloudflare Worker, enter your keys here. They're stored in localStorage — fine for personal use, but visible in browser DevTools.</div>
           <div class="settings-group">
             <div class="settings-field">
               <label>Google Places API Key</label>
@@ -693,7 +855,160 @@ td a:hover{text-decoration:underline;}
     </div>
   </div>
 
-</div>
+  <!-- CALL SCRIPT PANEL -->
+  <div class="panel" id="panel-callscript">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:600;">Call Script</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Stay on track · Handle objections · Log outcomes</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="cs-your-name" placeholder="Your name" style="background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 12px;outline:none;width:160px;" oninput="updateScriptName()"/>
+        <button class="btn btn-ghost btn-sm" onclick="resetCallScript()">Reset call</button>
+      </div>
+    </div>
+
+    <div class="cs-layout">
+      <!-- LEFT: SCRIPT + TRANSCRIPT + AI OBJECTION HANDLER -->
+      <div class="cs-main">
+
+        <!-- Stage selector (compact) -->
+        <div class="cs-card">
+          <div class="cs-card-title">
+            <span>Script Stage</span>
+            <button class="btn btn-ghost btn-sm" onclick="resetCallScript()" style="font-size:11px;padding:3px 9px;">↺ Reset call</button>
+          </div>
+          <div class="cs-stages" id="cs-stages">
+            <button class="cs-stage-btn active" onclick="setStage(0)">1. Opening</button>
+            <button class="cs-stage-btn" onclick="setStage(1)">2. Hook</button>
+            <button class="cs-stage-btn" onclick="setStage(2)">3. Send demo</button>
+            <button class="cs-stage-btn" onclick="setStage(3)">4. Close</button>
+            <button class="cs-stage-btn" onclick="setStage(4)">5. Follow-up</button>
+          </div>
+          <div class="cs-script" id="cs-script-content"></div>
+        </div>
+
+        <!-- Live Transcript -->
+        <div class="cs-transcript-card">
+          <div class="cs-card-title">
+            <span>🎙 Live Transcript</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span class="cs-mic-status" id="cs-mic-status">Mic off</span>
+              <button class="btn btn-ghost btn-sm" onclick="clearTranscript()" style="font-size:11px;padding:3px 9px;">Clear</button>
+            </div>
+          </div>
+          <div class="cs-mic-bar">
+            <button class="cs-mic-btn idle" id="cs-mic-btn" onclick="toggleMic()">
+              <span class="cs-mic-dot" id="cs-mic-dot"></span>
+              <span id="cs-mic-btn-label">Start listening</span>
+            </button>
+            <span style="font-size:11px;color:var(--muted2);">Captures your microphone — speak naturally</span>
+          </div>
+          <div class="cs-transcript-scroll" id="cs-transcript">
+            <div class="cs-tx-empty" id="cs-tx-empty">Press "Start listening" to begin transcribing the call in real-time.</div>
+          </div>
+        </div>
+
+        <!-- AI Objection Handler -->
+        <div class="cs-obj-card" id="cs-obj-card">
+          <div class="cs-card-title">
+            <span>⚡ AI Objection Handler</span>
+            <div class="cs-obj-thinking" id="cs-obj-thinking">
+              <div class="cs-obj-spin"></div>
+              <span>Analysing…</span>
+            </div>
+          </div>
+          <!-- Idle state -->
+          <div id="cs-obj-idle">
+            <div class="cs-obj-idle"><div class="cs-obj-idle-icon">👂</div>Listening for objections — AI will detect them automatically and suggest a tailored response based on your conversation.</div>
+          </div>
+          <!-- Active objection -->
+          <div class="cs-obj-detected" id="cs-obj-detected">
+            <div class="cs-obj-detected-label">Objection detected</div>
+            <div class="cs-obj-text" id="cs-obj-text"></div>
+            <div class="cs-obj-response-label">✦ Suggested response — tailored to this conversation</div>
+            <div class="cs-obj-response-box" id="cs-obj-response">
+              <button class="cs-obj-copy-btn" onclick="copyObjResponse()">Copy</button>
+              <span id="cs-obj-response-text"></span>
+            </div>
+            <div class="cs-obj-history" id="cs-obj-history" style="display:none;">
+              <div class="cs-obj-history-title">Earlier this call</div>
+              <div id="cs-obj-hist-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick tips -->
+        <div class="cs-card">
+          <div class="cs-card-title">Quick tips</div>
+          <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>Call between <strong>10am–12pm</strong> and <strong>2pm–5pm</strong> — owners are less busy than at open/close.</span></div>
+          <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>Keep the opening under <strong>20 seconds</strong>. Get to the hook fast.</span></div>
+          <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>The goal of this call is <strong>not to sell</strong> — it's to get permission to send the demo.</span></div>
+          <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>If they say yes to seeing the demo, <strong>ask for their email on the call</strong> — don't wait.</span></div>
+          <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>Silence after the close is good. <strong>Don't fill it.</strong> Let them respond.</span></div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: TIMER + MEETING INTEL + LEAD + NOTE + OUTCOME -->
+      <div class="cs-sidebar">
+
+        <!-- Timer -->
+        <div class="cs-card" style="text-align:center;">
+          <div class="cs-card-title" style="text-align:left;">Call timer</div>
+          <div class="cs-timer-display" id="cs-timer">0:00</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Ideal: 2–4 min &nbsp;·&nbsp; Follow-up: 5–8 min</div>
+          <div class="cs-timer-btns">
+            <button class="btn btn-accent btn-sm" id="cs-timer-btn" onclick="toggleTimer()">Start</button>
+            <button class="btn btn-ghost btn-sm" onclick="resetTimer()">Reset</button>
+          </div>
+        </div>
+
+        <!-- Meeting Intel -->
+        <div class="cs-intel-card" id="cs-intel-card">
+          <div class="cs-card-title">
+            <span>📊 Meeting Intel</span>
+            <span style="font-size:10px;color:var(--muted2);font-weight:400;text-transform:none;letter-spacing:0;">AI-extracted</span>
+          </div>
+          <div id="cs-intel-content">
+            <div class="cs-intel-empty">Start listening — AI will extract key intel from the conversation as you speak.</div>
+          </div>
+        </div>
+
+        <!-- Lead selector -->
+        <div class="cs-card">
+          <div class="cs-card-title">Current lead</div>
+          <select class="cs-lead-select" id="cs-lead-select" onchange="selectLead(this.value)">
+            <option value="">— Select a lead to call —</option>
+          </select>
+          <div class="cs-lead-info" id="cs-lead-info"></div>
+        </div>
+
+        <!-- Note -->
+        <div class="cs-card">
+          <div class="cs-card-title">
+            <span>Call note</span>
+            <button class="btn btn-sm btn-ghost" onclick="appendTranscriptToNote()" style="font-size:11px;padding:3px 9px;" title="Add transcript to note">+ Transcript</button>
+          </div>
+          <textarea class="cs-note" id="cs-note" placeholder="Jot anything mid-call — objections raised, follow-up date, email address..."></textarea>
+          <button class="btn btn-sm btn-accent" style="margin-top:8px;width:100%;" onclick="saveCallNote()">Save note to lead</button>
+        </div>
+
+        <!-- Outcome -->
+        <div class="cs-card">
+          <div class="cs-card-title">Call outcome</div>
+          <div class="cs-outcomes">
+            <button class="cs-outcome-btn cs-outcome-interested" onclick="logOutcome('interested','Interested — wants to see demo')">✦ Interested</button>
+            <button class="cs-outcome-btn cs-outcome-callback" onclick="logOutcome('contacted','Requested callback')">📞 Call back</button>
+            <button class="cs-outcome-btn cs-outcome-notinterested" onclick="logOutcome('pass','Not interested')">✕ Not interested</button>
+            <button class="cs-outcome-btn cs-outcome-voicemail" onclick="logOutcome('contacted','Left voicemail')">💬 Voicemail</button>
+          </div>
+          <div class="cs-outcome-flash" id="cs-outcome-flash"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
 <!-- AI CHAT BUBBLE -->
 <div class="ai-bubble">
@@ -727,7 +1042,6 @@ td a:hover{text-decoration:underline;}
 
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
 const SK = 'mss_leads_v2';
 const SK_SETTINGS = 'mss_settings_v1';
 const DEFAULT_BULK_KEYWORDS = ['med spa','botox clinic','laser hair removal','aesthetic clinic','skin rejuvenation','lip filler clinic'];
@@ -736,7 +1050,65 @@ const SERVICE_ICONS = ['✦','◈','◇','❋','◉','✿','❖','◆','✤','�
 
 let leads = [], nextId = 1, scanResults = [], visibleResults = [];
 
-// ── DEFAULT SERVICES ──────────────────────────────────────────────────────────
+// ── API ROUTING ────────────────────────────────────────────────────────────────
+// Priority: Worker URL (fully secure) → Browser keys (less secure)
+function getWorkerUrl(){ return (localStorage.getItem('mss_worker_url')||'').replace(/\/$/,''); }
+function getPlacesKey(){ return localStorage.getItem('mss_places_key')||''; }
+function getGeminiKey(){ return localStorage.getItem('mss_gemini_key')||''; }
+function usingWorker(){ return !!getWorkerUrl(); }
+
+// Unified Gemini caller — routes through Worker if configured, else direct
+async function callGemini(payload){
+  const wurl = getWorkerUrl();
+  if(wurl){
+    const res = await fetch(wurl+'/gemini',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  }
+  // Fallback: direct call with browser key
+  const gk = getGeminiKey();
+  if(!gk) throw new Error('No Gemini key. Add one in ⚙ Settings → API Keys or connect a Cloudflare Worker.');
+  const model = payload.model || 'gemini-2.0-flash';
+  const { model:_m, ...body } = payload;
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${gk}`,{
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+function checkKey(){
+  const wurl = getWorkerUrl();
+  const pk = getPlacesKey(), gk = getGeminiKey();
+  const tb = document.getElementById('topbar-key-status');
+  const sk = document.getElementById('settings-key-status');
+  const workerEl = document.getElementById('settings-worker-status');
+
+  if(wurl){
+    // Worker mode — fully secure
+    if(tb){tb.textContent='🔒 Worker active';tb.className='key-indicator ok';}
+    if(sk){sk.textContent='Routing via Worker';sk.className='key-indicator ok';}
+    if(workerEl){workerEl.textContent='● Worker connected';workerEl.className='key-indicator ok';}
+  } else {
+    const pOk=!!pk, gOk=!!gk;
+    if(pOk&&gOk){
+      if(tb){tb.textContent='✓ Keys active';tb.className='key-indicator ok';}
+      if(sk){sk.textContent='Both keys active';sk.className='key-indicator ok';}
+    } else if(pOk){
+      if(tb){tb.textContent='⚠ Gemini key missing';tb.className='key-indicator partial';}
+      if(sk){sk.textContent='Places key active';sk.className='key-indicator partial';}
+    } else {
+      if(tb){tb.textContent='⚠ Keys not set';tb.className='key-indicator empty';}
+      if(sk){sk.textContent='No keys set';sk.className='key-indicator empty';}
+    }
+    if(workerEl){workerEl.textContent='No worker';workerEl.className='key-indicator empty';}
+  }
+  const pi=document.getElementById('s-places-key');
+  const gi=document.getElementById('s-gemini-key');
+  if(pi&&!pi.value&&pk)pi.placeholder='(key saved — enter new to replace)';
+  if(gi&&!gi.value&&gk)gi.placeholder='(key saved — enter new to replace)';
+}
 let customServices = [
   {id:1,enabled:true, name:'Botox & Dysport',    price:'300',unit:'area',   icon:'✦',desc:'Smooth fine lines and wrinkles with precision neurotoxin injections.'},
   {id:2,enabled:true, name:'Lip Fillers',         price:'650',unit:'syringe',icon:'◈',desc:'Enhance volume and definition with hyaluronic acid fillers.'},
@@ -793,35 +1165,67 @@ function checkKey(){
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(t){
-  const tabs=['scanner','tracker','demo','settings'];
+  const tabs=['scanner','tracker','demo','settings','callscript'];
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',tabs[i]===t));
   document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
   document.getElementById('panel-'+t).classList.add('active');
   if(t==='tracker')renderTracker();
   if(t==='demo')renderServiceList();
   if(t==='settings'){loadSettingsUI();updateStorageUsed();}
+  if(t==='callscript'){initCallScript();}
 }
 
 // ── ERROR ─────────────────────────────────────────────────────────────────────
 function showError(msg){const e=document.getElementById('error-msg');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),7000);}
 
 // ── PROXY + API ───────────────────────────────────────────────────────────────
-function proxied(url){return PROXY+'?url='+encodeURIComponent(url);}
-async function geocode(city,key){
-  const r=await fetch(proxied(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${key}`));
-  const d=await r.json();
-  if(d.status!=='OK')throw new Error('Could not find location. Try "City, State".');
+async function geocode(city){
+  const wurl = getWorkerUrl();
+  if(wurl){
+    const r = await fetch(`${wurl}/geocode?city=${encodeURIComponent(city)}`);
+    const d = await r.json();
+    if(d.status!=='OK') throw new Error('Could not find location. Try "City, State".');
+    return d.results[0].geometry.location;
+  }
+  // Fallback: old proxy
+  const key = getPlacesKey();
+  if(!key) throw new Error('No Places API key. Add one in ⚙ Settings or connect a Worker.');
+  const LEGACY_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
+  const r = await fetch(LEGACY_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${key}`));
+  const d = await r.json();
+  if(d.status!=='OK') throw new Error('Could not find location. Try "City, State".');
   return d.results[0].geometry.location;
 }
-async function placesSearch(lat,lng,radius,kw,key){
+
+async function placesSearch(lat,lng,radius,kw){
+  const wurl = getWorkerUrl();
+  if(wurl){
+    const qs = `lat=${lat}&lng=${lng}&radius=${radius}${kw?'&keyword='+encodeURIComponent(kw):''}`;
+    const r = await fetch(`${wurl}/places?${qs}`);
+    return r.json();
+  }
+  const key = getPlacesKey();
+  if(!key) throw new Error('No Places API key.');
+  const LEGACY_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
   const base=`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&key=${key}`;
-  const url=kw?base+`&keyword=${encodeURIComponent(kw)}`:base+`&type=establishment`;
-  const r=await fetch(proxied(url));
+  const url = kw ? base+`&keyword=${encodeURIComponent(kw)}` : base+`&type=establishment`;
+  const r = await fetch(LEGACY_PROXY+'?url='+encodeURIComponent(url));
   return r.json();
 }
-async function getDetails(pid,key){
-  const r=await fetch(proxied(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${pid}&fields=name,formatted_phone_number,website,rating,user_ratings_total,formatted_address&key=${key}`));
-  const d=await r.json();return d.result||{};
+
+async function getDetails(pid){
+  const wurl = getWorkerUrl();
+  if(wurl){
+    const r = await fetch(`${wurl}/details?place_id=${encodeURIComponent(pid)}`);
+    const d = await r.json();
+    return d.result || d;
+  }
+  const key = getPlacesKey();
+  if(!key) return {};
+  const LEGACY_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
+  const r = await fetch(LEGACY_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${pid}&fields=name,formatted_phone_number,website,rating,user_ratings_total,formatted_address&key=${key}`));
+  const d = await r.json();
+  return d.result||{};
 }
 
 // ── WEBSITE SCORE ────────────────────────────────────────────────────────────
@@ -922,8 +1326,7 @@ function renderCards(places){
 
 // ── SCAN ──────────────────────────────────────────────────────────────────────
 async function runScan(){
-  const key=getPlacesKey();
-  if(!key){showError('Please enter your Google Places API key in ⚙ Settings → API Keys.');switchTab('settings');return;}
+  if(!usingWorker()&&!getPlacesKey()){showError('Add a Cloudflare Worker URL or Places API key in ⚙ Settings.');switchTab('settings');return;}
   const city=document.getElementById('s-city').value.trim();
   if(!city){showError('Enter a city or area to search.');return;}
   closeSuggestions();
@@ -939,46 +1342,35 @@ async function runScan(){
   document.getElementById('ai-filter-bar').classList.remove('show');
   document.getElementById('result-count').style.display='none';
   try{
-    const loc=await geocode(city,key);
+    const loc=await geocode(city);
     const label=kw||'businesses';
     document.getElementById('loader-msg').textContent=`Scanning for ${label} near ${city}...`;
-    const data=await placesSearch(loc.lat,loc.lng,radius,kw,key);
+    const data=await placesSearch(loc.lat,loc.lng,radius,kw);
     if(data.status==='REQUEST_DENIED')throw new Error('API key rejected. Check Places API and Geocoding API are enabled.');
     if(data.status==='ZERO_RESULTS'||!data.results?.length){document.getElementById('loader').classList.remove('active');document.getElementById('scan-empty').classList.add('show');return;}
     document.getElementById('loader-msg').textContent=`Loading details for ${data.results.length} businesses...`;
     const detailed=await Promise.all(data.results.slice(0,20).map(async p=>{
-      try{const det=await getDetails(p.place_id,key);return{name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
+      try{const det=await getDetails(p.place_id);return{name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
       catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
     }));
     scanResults=detailed;visibleResults=detailed;
     document.getElementById('loader').classList.remove('active');
     document.getElementById('filter-bar').classList.add('show');
     clearFilters();
-    // Apply autoFilterNoWeb setting
     const _s=getSettings();
-    if(_s.autoFilterNoWeb){
-      document.getElementById('f-sort').value='no_web';
-      applyFilters();
-    }
-    // Auto-add to tracker if setting is on
-    if(_s.autoAddTracker){
-      detailed.forEach((_,i)=>addOne(i));
-      updateTrackerCount();
-    }
-    // Run AI relevance scoring if a search type was entered and Gemini key exists
-    if(kw&&getGeminiKey()){
-      aiScoreResults(kw,detailed);
-    }
+    if(_s.autoFilterNoWeb){document.getElementById('f-sort').value='no_web';applyFilters();}
+    if(_s.autoAddTracker){detailed.forEach((_,i)=>addOne(i));updateTrackerCount();}
+    if(kw&&(usingWorker()||getGeminiKey())){aiScoreResults(kw,detailed);}
   }catch(e){
     document.getElementById('loader').classList.remove('active');
-    showError(e.message||'Something went wrong. Check your API key and try again.');
+    showError(e.message||'Something went wrong. Check your configuration and try again.');
   }
 }
 
 // ── AI RELEVANCE SCORING ──────────────────────────────────────────────────────
 async function aiScoreResults(searchType,results){
-  const gk=getGeminiKey();
-  if(!gk||!results.length)return;
+  if(!results.length)return;
+  if(!usingWorker()&&!getGeminiKey())return;
   const bar=document.getElementById('ai-filter-bar');
   const msg=document.getElementById('ai-filter-msg');
   const spinner=document.getElementById('ai-filter-spinner');
@@ -1004,11 +1396,7 @@ Businesses:
 ${list}`;
 
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gk}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
-    });
-    const d=await res.json();
+    const d=await callGemini({contents:[{parts:[{text:prompt}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'[]';
     const clean=raw.replace(/```json|```/g,'').trim();
     const scores=JSON.parse(clean);
@@ -1097,8 +1485,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search-type-wrap'))
 
 // ── BULK SCAN ────────────────────────────────────────────────────────────────
 async function runBulkScan(){
-  const key=getPlacesKey();
-  if(!key){showError('Please enter your Google Places API key in ⚙ Settings → API Keys.');switchTab('settings');return;}
+  if(!usingWorker()&&!getPlacesKey()){showError('Add a Cloudflare Worker URL or Places API key in ⚙ Settings.');switchTab('settings');return;}
   const city=document.getElementById('s-city').value.trim();
   if(!city){showError('Enter a city or area to search.');return;}
   const radius=document.getElementById('s-radius').value;
@@ -1112,7 +1499,7 @@ async function runBulkScan(){
   const kwDiv=document.getElementById('bulk-keywords');
   kwDiv.innerHTML=BULK_KEYWORDS.map((k,i)=>`<span class="kw-tag pending" id="kw-${i}">${k}</span>`).join('');
   let loc;
-  try{document.getElementById('bulk-status').textContent='Finding location...';loc=await geocode(city,key);}
+  try{document.getElementById('bulk-status').textContent='Finding location...';loc=await geocode(city);}
   catch(e){showError(e.message);document.getElementById('bulk-progress').style.display='none';return;}
   const allResults=[];const seenNames=new Set(leads.map(l=>l.name.toLowerCase()));
   for(let i=0;i<BULK_KEYWORDS.length;i++){
@@ -1121,11 +1508,11 @@ async function runBulkScan(){
     document.getElementById('bulk-status').textContent=`Scanning: ${kw}...`;
     document.getElementById('bulk-bar').style.width=Math.round((i/BULK_KEYWORDS.length)*100)+'%';
     try{
-      const data=await placesSearch(loc.lat,loc.lng,radius,kw,key);
+      const data=await placesSearch(loc.lat,loc.lng,radius,kw);
       if(data.results?.length){
         const det=await Promise.all(data.results.slice(0,20).map(async p=>{
           if(seenNames.has(p.name.toLowerCase()))return null;
-          try{const d=await getDetails(p.place_id,key);return{name:p.name,phone:d.formatted_phone_number||'',website:d.website||'',address:d.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
+          try{const d=await getDetails(p.place_id);return{name:p.name,phone:d.formatted_phone_number||'',website:d.website||'',address:d.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
           catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
         }));
         det.filter(Boolean).forEach(p=>{if(!seenNames.has(p.name.toLowerCase())){seenNames.add(p.name.toLowerCase());allResults.push(p);}});
@@ -1274,8 +1661,7 @@ function updatePreview(){
 async function pasteAutoFill(){
   const text=document.getElementById('paste-box').value.trim();
   if(!text){addAIMsg('assistant','Please paste some spa information in the box first.');return;}
-  const gk=getGeminiKey();
-  if(!gk){addAIMsg('assistant','Please add your Gemini API key in ⚙ Settings → API Keys.');switchTab('settings');return;}
+  if(!usingWorker()&&!getGeminiKey()){addAIMsg('assistant','Add a Cloudflare Worker or Gemini key in ⚙ Settings.');switchTab('settings');return;}
   addAIMsg('assistant','Reading the pasted info and filling the form...');
   const prompt=`Extract spa business details from this text and return ONLY valid JSON, no markdown, no explanation:
 {"name":"","tagline":"","city":"","phone":"","email":"","address":"","services":[{"name":"","price":"","unit":""}]}
@@ -1290,11 +1676,7 @@ Rules:
 Text to extract from:
 ${text}`;
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gk}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
-    });
-    const d=await res.json();
+    const d=await callGemini({contents:[{parts:[{text:prompt}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
     const clean=raw.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
@@ -1524,8 +1906,7 @@ async function sendAI(msg){
   document.getElementById('ai-input').value='';
   addAIMsg('user',msg);
   const thinking=addAIMsg('assistant thinking','Thinking...');
-  const gk=getGeminiKey();
-  if(!gk){thinking.textContent='Please add your Gemini API key in ⚙ Settings → API Keys.';thinking.className='ai-msg assistant';switchTab('settings');return;}
+  if(!usingWorker()&&!getGeminiKey()){thinking.textContent='Add a Cloudflare Worker or Gemini key in ⚙ Settings.';thinking.className='ai-msg assistant';switchTab('settings');return;}
 
   // Build app state context
   const state={
@@ -1563,11 +1944,7 @@ Return ONLY valid JSON: {"actions":[...],"reply":"your friendly reply to the use
 No markdown, no explanation outside the JSON.`;
 
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gk}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:systemPrompt+'\n\nUser says: '+msg}]}]})
-    });
-    const d=await res.json();
+    const d=await callGemini({contents:[{parts:[{text:systemPrompt+'\n\nUser says: '+msg}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
     const clean=raw.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
@@ -1614,6 +1991,50 @@ function showSettingsSection(name){
   if(name==='data')updateStorageUsed();
 }
 
+function saveWorkerUrl(){
+  const url = document.getElementById('s-worker-url').value.trim().replace(/\/$/,'');
+  if(url) localStorage.setItem('mss_worker_url', url);
+  checkKey();
+  flashConfirm('worker-saved-confirm');
+  // Populate input with saved value
+  document.getElementById('s-worker-url').value = '';
+  document.getElementById('s-worker-url').placeholder = url || 'https://medspa-scanner-api.yourname.workers.dev';
+}
+
+function clearWorkerUrl(){
+  if(!confirm('Remove the Worker URL? The app will fall back to browser API keys.')) return;
+  localStorage.removeItem('mss_worker_url');
+  document.getElementById('s-worker-url').value = '';
+  document.getElementById('s-worker-url').placeholder = 'https://medspa-scanner-api.yourname.workers.dev';
+  checkKey();
+  alert('Worker URL removed.');
+}
+
+async function testWorker(){
+  const url = document.getElementById('s-worker-url').value.trim().replace(/\/$/,'') || getWorkerUrl();
+  if(!url){ alert('Enter a Worker URL first.'); return; }
+  const resultEl = document.getElementById('worker-test-result');
+  resultEl.style.display = 'block';
+  resultEl.style.color = 'var(--muted)';
+  resultEl.textContent = 'Testing connection to ' + url + '/ping …';
+  try{
+    const res = await fetch(url+'/ping');
+    const d = await res.json();
+    if(d.ok){
+      resultEl.style.color = 'var(--success)';
+      resultEl.innerHTML = '✓ Worker is online!<br/>'
+        + 'PLACES_KEY: ' + (d.placesKey||'unknown') + '<br/>'
+        + 'GEMINI_KEY: ' + (d.geminiKey||'unknown');
+    } else {
+      resultEl.style.color = 'var(--warn)';
+      resultEl.textContent = '⚠ Worker responded but returned unexpected data: ' + JSON.stringify(d);
+    }
+  }catch(e){
+    resultEl.style.color = 'var(--danger)';
+    resultEl.textContent = '✗ Could not reach worker: ' + e.message + '\nMake sure CORS is enabled and the URL is correct.';
+  }
+}
+
 function loadSettingsUI(){
   // API keys — show placeholder if key already saved
   const pk=localStorage.getItem('mss_places_key')||'';
@@ -1622,6 +2043,10 @@ function loadSettingsUI(){
   const gi=document.getElementById('s-gemini-key');
   if(pi){pi.value='';pi.placeholder=pk?'(key saved — enter new to replace)':'AIzaSy...';}
   if(gi){gi.value='';gi.placeholder=gk?'(key saved — enter new to replace)':'AIzaSy...';}
+  // Worker URL
+  const wu = getWorkerUrl();
+  const wInput = document.getElementById('s-worker-url');
+  if(wInput){ wInput.value=''; wInput.placeholder = wu ? wu : 'https://medspa-scanner-api.yourname.workers.dev'; }
 
   // Scan defaults
   try{
@@ -1761,6 +2186,451 @@ function clearAllData(){if(!confirm('Reset EVERYTHING — leads, settings, keys?
 function flashConfirm(id){const el=document.getElementById(id);if(!el)return;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+
+// ── CALL SCRIPT ───────────────────────────────────────────────────────────────
+const CS_STAGES = [
+  {
+    label: '1. Opening',
+    script: `<span class="cs-you">You say:</span>
+<p>"Hey, is this the owner of <span class='cs-highlight' id='cs-biz-name'>[Business Name]</span>?"</p>
+<p><em style="color:var(--muted);font-size:12px;">[Wait for confirmation]</em></p>
+<p>"Hi — my name is <span class='cs-highlight' id='cs-caller-name-0'>[Your Name]</span>. I'm not trying to sell you anything today — I just had a quick question. Do you have 30 seconds?"</p>
+<p><em style="color:var(--muted);font-size:12px;">[Wait — almost everyone says yes]</em></p>`
+  },
+  {
+    label: '2. Hook',
+    script: `<span class="cs-you">You say:</span>
+<p>"I was looking at med spas in the area and I noticed your website is missing a few things that are stopping people from booking — specifically a booking button and a before/after gallery."</p>
+<p>"I actually went ahead and built a quick redesign of your homepage to show you what it could look like."</p>
+<p>"It took me about an hour. Would you like me to send it over? It's completely free."</p>`
+  },
+  {
+    label: '3. Send demo',
+    script: `<span class="cs-you">When they say yes:</span>
+<p>"Perfect. What's the best email to send it to?"</p>
+<p><em style="color:var(--muted);font-size:12px;">[Write it down in the note field →]</em></p>
+<p>"Great — I'll send it over right now. It's a full homepage redesign — new layout, booking button, before/after gallery, and contact form."</p>
+<p>"Can I call you back in 24 hours to see what you think?"</p>`
+  },
+  {
+    label: '4. Close',
+    script: `<span class="cs-you">When they've seen the demo:</span>
+<p>"So what did you think of the mockup?"</p>
+<p><em style="color:var(--muted);font-size:12px;">[Let them respond — don't fill the silence]</em></p>
+<p>"I can build that out fully — the whole site, live and working — for <span class='cs-highlight'>$2,500</span>. If it doesn't bring you more bookings in 60 days, I keep working for free."</p>
+<p>"Does that sound like something you'd want to move forward with?"</p>
+<p><em style="color:var(--muted);font-size:12px;">[Wait. Do not speak first.]</em></p>`
+  },
+  {
+    label: '5. Follow-up',
+    script: `<span class="cs-you">For callbacks and follow-ups:</span>
+<p>"Hey <span class='cs-highlight' id='cs-biz-name-fu'>[Name]</span>, it's <span class='cs-highlight' id='cs-caller-name-fu'>[Your Name]</span> — I sent you the website mockup. Did you get a chance to look at it?"</p>
+<p><em style="color:var(--muted);font-size:12px;">[Wait for response]</em></p>
+<p>"Did anything jump out at you? Happy to tweak anything or add something specific."</p>
+<p>"The offer is still open — $2,500 with the 60-day guarantee. When would be a good time to move forward?"</p>`
+  }
+];
+
+let csStageIdx = 0;
+let csTimerInterval = null;
+let csTimerSeconds = 0;
+let csTimerRunning = false;
+let csSelectedLeadId = null;
+
+function initCallScript(){
+  renderCallStage();
+  populateLeadSelector();
+  updateScriptName();
+}
+
+function renderCallStage(){
+  const stage = CS_STAGES[csStageIdx];
+  document.getElementById('cs-script-content').innerHTML = stage.script;
+  document.querySelectorAll('.cs-stage-btn').forEach((btn,i)=>btn.classList.toggle('active',i===csStageIdx));
+  updateScriptName();
+}
+
+function setStage(i){ csStageIdx=i; renderCallStage(); }
+
+function updateScriptName(){
+  const name=(document.getElementById('s-your-name')||{}).value||'[Your Name]';
+  const bizEl=document.getElementById('cs-lead-select');
+  const bizName=bizEl&&bizEl.value?(leads.find(l=>l.id==bizEl.value)||{}).name||'[Business Name]':'[Business Name]';
+  ['cs-caller-name-0','cs-caller-name-fu'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=name;});
+  ['cs-biz-name','cs-biz-name-fu'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=bizName;});
+}
+
+// ── LIVE TRANSCRIPT + AI ANALYSIS ─────────────────────────────────────────────
+let recognition = null;
+let micActive = false;
+let transcriptLines = [];       // {speaker:'you', text:'...'}
+let interimEl = null;
+let aiAnalysisTimer = null;
+let objectionHistory = [];
+let lastAnalysedLength = 0;
+const AI_DEBOUNCE_MS = 5000;    // analyse 5s after last speech segment
+
+function toggleMic(){
+  if(micActive) stopMic(); else startMic();
+}
+
+function startMic(){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec){ alert('Sorry — your browser doesn\'t support the Speech Recognition API. Use Chrome or Edge.'); return; }
+  recognition = new SpeechRec();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = ()=>{
+    micActive = true;
+    document.getElementById('cs-mic-btn').className = 'cs-mic-btn listening';
+    document.getElementById('cs-mic-btn-label').textContent = 'Listening…';
+    document.getElementById('cs-mic-dot').classList.add('listening');
+    document.getElementById('cs-mic-status').textContent = '● Recording';
+    document.getElementById('cs-mic-status').className = 'cs-mic-status on';
+    document.getElementById('cs-tx-empty').style.display = 'none';
+    // Auto-start timer if not running
+    if(!csTimerRunning) toggleTimer();
+  };
+
+  recognition.onresult = (e)=>{
+    let interim = '';
+    let finalText = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalText += t;
+      else interim += t;
+    }
+    if(finalText.trim()){
+      addTranscriptLine('you', finalText.trim());
+      scheduleAiAnalysis();
+    }
+    // Update interim display
+    if(!interimEl){
+      interimEl = document.createElement('div');
+      interimEl.className = 'cs-tx-line';
+      interimEl.innerHTML = '<span class="cs-tx-speaker cs-tx-you">You</span><span class="cs-tx-interim"></span>';
+      document.getElementById('cs-transcript').appendChild(interimEl);
+    }
+    if(interim){
+      interimEl.querySelector('.cs-tx-interim').textContent = interim;
+    } else if(interimEl){
+      interimEl.remove();
+      interimEl = null;
+    }
+    scrollTranscript();
+  };
+
+  recognition.onerror = (e)=>{ if(e.error!=='aborted') stopMic(); };
+  recognition.onend = ()=>{ if(micActive) recognition.start(); }; // keep going
+
+  recognition.start();
+}
+
+function stopMic(){
+  micActive = false;
+  if(recognition){ try{recognition.stop();}catch(e){} recognition=null; }
+  document.getElementById('cs-mic-btn').className = 'cs-mic-btn idle';
+  document.getElementById('cs-mic-btn-label').textContent = 'Start listening';
+  document.getElementById('cs-mic-dot').classList.remove('listening');
+  document.getElementById('cs-mic-status').textContent = 'Mic off';
+  document.getElementById('cs-mic-status').className = 'cs-mic-status';
+  if(interimEl){ interimEl.remove(); interimEl=null; }
+  clearTimeout(aiAnalysisTimer);
+}
+
+function addTranscriptLine(speaker, text){
+  transcriptLines.push({speaker, text, ts: Date.now()});
+  const wrap = document.getElementById('cs-transcript');
+  const div = document.createElement('div');
+  div.className = 'cs-tx-line';
+  div.innerHTML = `<span class="cs-tx-speaker cs-tx-you">You</span><span>${esc(text)}</span>`;
+  // Insert before interim if it exists
+  if(interimEl) wrap.insertBefore(div, interimEl);
+  else wrap.appendChild(div);
+  scrollTranscript();
+}
+
+function scrollTranscript(){
+  const wrap = document.getElementById('cs-transcript');
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function clearTranscript(){
+  transcriptLines = [];
+  objectionHistory = [];
+  lastAnalysedLength = 0;
+  document.getElementById('cs-transcript').innerHTML = '<div class="cs-tx-empty" id="cs-tx-empty">Press "Start listening" to begin transcribing.</div>';
+  interimEl = null;
+  resetObjectionUI();
+  document.getElementById('cs-intel-content').innerHTML = '<div class="cs-intel-empty">Start listening — AI will extract key intel from the conversation as you speak.</div>';
+}
+
+function scheduleAiAnalysis(){
+  if(!getGeminiKey()) return;
+  clearTimeout(aiAnalysisTimer);
+  aiAnalysisTimer = setTimeout(()=>runAiAnalysis(), AI_DEBOUNCE_MS);
+}
+
+async function runAiAnalysis(){
+  const gk = getGeminiKey();
+  if(!gk || transcriptLines.length === 0) return;
+  // Only analyse if there's new content
+  if(transcriptLines.length === lastAnalysedLength) return;
+  lastAnalysedLength = transcriptLines.length;
+
+  // Show thinking states
+  document.getElementById('cs-obj-thinking').classList.add('show');
+
+  const leadEl = document.getElementById('cs-lead-select');
+  const lead = leadEl && leadEl.value ? leads.find(l=>l.id==leadEl.value) : null;
+  const leadCtx = lead ? `Lead: ${lead.name}, city: ${lead.city||'unknown'}, notes: ${lead.notes||'none'}` : 'No specific lead selected.';
+  const fullTranscript = transcriptLines.map(l=>`[You]: ${l.text}`).join('\n');
+  const objHistCtx = objectionHistory.length ? 'Objections already handled this call: '+objectionHistory.map(o=>'"'+o+'"').join(', ') : 'No previous objections.';
+
+  const prompt = `You are a real-time AI sales coach listening to a cold-call where someone is selling web design services to a med spa or local business. The salesperson is pitching a website redesign.
+
+Context:
+- ${leadCtx}
+- ${objHistCtx}
+- Current call transcript (only salesperson's words are captured):
+${fullTranscript}
+
+Analyse the transcript and return ONLY valid JSON, no markdown, no explanation:
+{
+  "objection": "exact quote or paraphrase of the most recent objection the prospect likely raised, or null if none detected",
+  "suggestedResponse": "a tailored, conversational response to the objection that references specific things said in this conversation. Make it natural, not scripted. If no objection, return null.",
+  "painPoints": ["brief pain point 1", "brief pain point 2"],
+  "interestSignals": ["signal 1", "signal 2"],
+  "contextToUse": ["thing to reference in your pitch 1", "thing to reference 2"],
+  "nextSuggestion": "one-sentence suggestion for what the salesperson should say or do next"
+}
+
+Rules:
+- Objections are detected from context clues in what the SALESPERSON says (e.g. if they say "I understand you have a website" → the prospect said they have a website)
+- Keep pain points, interest signals, and context items short (under 8 words each)
+- nextSuggestion should be actionable and specific to THIS call
+- If there's genuinely nothing to report for a field, use empty array [] or null`;
+
+  try{
+    const d = await callGemini({contents:[{parts:[{text:prompt}]}]});
+    const raw = d.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const analysis = JSON.parse(clean);
+
+    document.getElementById('cs-obj-thinking').classList.remove('show');
+
+    // Update objection handler
+    if(analysis.objection && analysis.suggestedResponse){
+      if(!objectionHistory.includes(analysis.objection)){
+        objectionHistory.push(analysis.objection);
+      }
+      showObjection(analysis.objection, analysis.suggestedResponse);
+    }
+
+    // Update meeting intel
+    updateMeetingIntel(analysis);
+
+  }catch(e){
+    document.getElementById('cs-obj-thinking').classList.remove('show');
+  }
+}
+
+function showObjection(objText, response){
+  const card = document.getElementById('cs-obj-card');
+  card.classList.add('alert');
+  document.getElementById('cs-obj-idle').style.display = 'none';
+  const det = document.getElementById('cs-obj-detected');
+  det.classList.add('show');
+  document.getElementById('cs-obj-text').textContent = '"' + objText + '"';
+  document.getElementById('cs-obj-response-text').textContent = response;
+
+  // History
+  if(objectionHistory.length > 1){
+    const histDiv = document.getElementById('cs-obj-history');
+    histDiv.style.display = 'block';
+    document.getElementById('cs-obj-hist-list').innerHTML =
+      objectionHistory.slice(0,-1).map(o=>`<div class="cs-obj-hist-item">${esc(o)}</div>`).join('');
+  }
+}
+
+function resetObjectionUI(){
+  document.getElementById('cs-obj-card').classList.remove('alert');
+  document.getElementById('cs-obj-idle').style.display = '';
+  document.getElementById('cs-obj-detected').classList.remove('show');
+  document.getElementById('cs-obj-history').style.display = 'none';
+  document.getElementById('cs-obj-hist-list').innerHTML = '';
+  objectionHistory = [];
+}
+
+function copyObjResponse(){
+  const text = document.getElementById('cs-obj-response-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.querySelector('.cs-obj-copy-btn');
+    const orig = btn.textContent; btn.textContent='✓ Copied!';
+    setTimeout(()=>btn.textContent=orig, 1800);
+  });
+}
+
+function updateMeetingIntel(analysis){
+  const container = document.getElementById('cs-intel-content');
+  const sections = [];
+
+  if(analysis.nextSuggestion){
+    sections.push(`<div class="cs-intel-section">
+      <div class="cs-intel-label suggest">✦ Next move</div>
+      <div class="cs-intel-items"><div class="cs-intel-item suggest">${esc(analysis.nextSuggestion)}</div></div>
+    </div>`);
+  }
+
+  if(analysis.painPoints?.length){
+    sections.push(`<div class="cs-intel-section">
+      <div class="cs-intel-label pain">Pain points</div>
+      <div class="cs-intel-items">${analysis.painPoints.map(p=>`<div class="cs-intel-item pain">${esc(p)}</div>`).join('')}</div>
+    </div>`);
+  }
+
+  if(analysis.interestSignals?.length){
+    sections.push(`<div class="cs-intel-section">
+      <div class="cs-intel-label interest">Interest signals</div>
+      <div class="cs-intel-items">${analysis.interestSignals.map(s=>`<div class="cs-intel-item interest">${esc(s)}</div>`).join('')}</div>
+    </div>`);
+  }
+
+  if(analysis.contextToUse?.length){
+    sections.push(`<div class="cs-intel-section">
+      <div class="cs-intel-label context">Reference in pitch</div>
+      <div class="cs-intel-items">${analysis.contextToUse.map(c=>`<div class="cs-intel-item context">${esc(c)}</div>`).join('')}</div>
+    </div>`);
+  }
+
+  container.innerHTML = sections.length ? sections.join('') : '<div class="cs-intel-empty">Keep talking — more intel will appear as the conversation develops.</div>';
+}
+
+function appendTranscriptToNote(){
+  if(!transcriptLines.length){ return; }
+  const note = document.getElementById('cs-note');
+  const lines = transcriptLines.map(l=>'[You] '+l.text).join('\n');
+  note.value = (note.value ? note.value+'\n\n--- Transcript ---\n' : '--- Transcript ---\n') + lines;
+}
+
+// Timer
+function toggleTimer(){
+  if(csTimerRunning){
+    clearInterval(csTimerInterval);
+    csTimerRunning = false;
+    document.getElementById('cs-timer-btn').textContent = 'Resume';
+  } else {
+    csTimerRunning = true;
+    document.getElementById('cs-timer-btn').textContent = 'Pause';
+    csTimerInterval = setInterval(()=>{
+      csTimerSeconds++;
+      const m = Math.floor(csTimerSeconds/60);
+      const s = csTimerSeconds%60;
+      const el = document.getElementById('cs-timer');
+      el.textContent = m+':'+(s<10?'0':'')+s;
+      el.className = 'cs-timer-display'+(csTimerSeconds>=480?' over':csTimerSeconds>=120?' warn':'');
+    },1000);
+  }
+}
+
+function resetTimer(){
+  clearInterval(csTimerInterval);
+  csTimerRunning = false;
+  csTimerSeconds = 0;
+  document.getElementById('cs-timer').textContent = '0:00';
+  document.getElementById('cs-timer').className = 'cs-timer-display';
+  document.getElementById('cs-timer-btn').textContent = 'Start';
+}
+
+function resetCallScript(){
+  stopMic();
+  resetTimer();
+  setStage(0);
+  clearTranscript();
+  document.getElementById('cs-note').value = '';
+  document.getElementById('cs-lead-select').value = '';
+  document.getElementById('cs-lead-info').classList.remove('show');
+  document.getElementById('cs-outcome-flash').classList.remove('show');
+  csSelectedLeadId = null;
+}
+
+// Lead selector
+function populateLeadSelector(){
+  const sel = document.getElementById('cs-lead-select');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select a lead to call —</option>';
+  const active = leads.filter(l=>l.status==='new'||l.status==='contacted'||l.status==='interested');
+  if(active.length){
+    const grp = document.createElement('optgroup');
+    grp.label = 'Active leads ('+active.length+')';
+    active.forEach(l=>{
+      const o = document.createElement('option');
+      o.value = l.id;
+      o.textContent = l.name+(l.city?' — '+l.city:'');
+      grp.appendChild(o);
+    });
+    sel.appendChild(grp);
+  }
+  if(cur) sel.value = cur;
+}
+
+function selectLead(idStr){
+  csSelectedLeadId = idStr ? parseInt(idStr) : null;
+  const info = document.getElementById('cs-lead-info');
+  const note = document.getElementById('cs-note');
+  if(!csSelectedLeadId){ info.classList.remove('show'); return; }
+  const l = leads.find(l=>l.id===csSelectedLeadId);
+  if(!l){ info.classList.remove('show'); return; }
+  info.classList.add('show');
+  info.innerHTML = `
+    <strong>${esc(l.name)}</strong><br>
+    ${l.city?'📍 '+esc(l.city)+'<br>':''}
+    ${l.phone?'📞 <a href="tel:'+esc(l.phone)+'" style="color:var(--info);">'+esc(l.phone)+'</a><br>':'<span style="color:var(--danger)">No phone on file</span><br>'}
+    ${l.web?'🌐 <a href="https://'+esc(l.web)+'" target="_blank" style="color:var(--info);">'+esc(l.web)+'</a><br>':''}
+    ${l.notes?'<span style="color:var(--muted)">'+esc(l.notes)+'</span>':''}`;
+  note.value = '';
+  note.placeholder = 'Notes for '+l.name+'...';
+  updateScriptName();
+}
+
+function saveCallNote(){
+  if(!csSelectedLeadId){ alert('Select a lead first.'); return; }
+  const note = document.getElementById('cs-note').value.trim();
+  if(!note) return;
+  const l = leads.find(l=>l.id===csSelectedLeadId);
+  if(!l) return;
+  l.notes = note;
+  save();
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Saved!';
+  setTimeout(()=>btn.textContent=orig,2000);
+}
+
+function logOutcome(status, noteText){
+  if(!csSelectedLeadId){ alert('Select a lead first.'); return; }
+  const l = leads.find(l=>l.id===csSelectedLeadId);
+  if(!l) return;
+  l.status = status;
+  if(noteText){
+    const ts = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    l.notes = '['+ts+'] '+noteText+(document.getElementById('cs-note').value?' — '+document.getElementById('cs-note').value:'');
+  }
+  save();
+  const flash = document.getElementById('cs-outcome-flash');
+  const labels = {interested:'✦ Marked as Interested!',contacted:'Logged — follow up scheduled',pass:'Marked as Pass',};
+  flash.textContent = labels[status]||'Logged!';
+  flash.className = 'cs-outcome-flash show';
+  flash.style.background = status==='interested'?'var(--success-dim)':status==='pass'?'var(--danger-dim)':'var(--warn-dim)';
+  flash.style.color = status==='interested'?'var(--success)':status==='pass'?'var(--danger)':'var(--warn)';
+  setTimeout(()=>flash.classList.remove('show'),3000);
+  renderTracker();
+  populateLeadSelector();
+}
+
 load();renderTracker();updateTrackerCount();renderServiceList();checkKey();applyScanDefaultsToUI();
 </script>
 </body>
