@@ -629,6 +629,8 @@ td a:hover{text-decoration:underline;}
           <div class="demo-field"><label>Phone</label><input id="d-phone" placeholder="e.g. (301) 555-0182" oninput="updatePreview()"/></div>
           <div class="demo-field"><label>Email</label><input id="d-email" placeholder="e.g. hello@glowspa.com" oninput="updatePreview()"/></div>
           <div class="demo-field"><label>Address</label><input id="d-address" placeholder="e.g. 123 Wisconsin Ave, Bethesda MD" oninput="updatePreview()"/></div>
+          <div class="demo-field"><label>Google rating</label><input id="d-google-rating" placeholder="e.g. 4.8 (filled from scan)" oninput="updatePreview()"/></div>
+          <div class="demo-field"><label>Review highlights</label><textarea id="d-review-highlights" rows="4" placeholder="Short quotes from Google Places reviews — auto-filled when you use Demo from a scan result" oninput="updatePreview()"></textarea></div>
         </div>
         <div class="demo-section" style="margin-top:1rem;">
           <div class="demo-section-title">Hero colour</div>
@@ -902,7 +904,7 @@ td a:hover{text-decoration:underline;}
               <span class="cs-mic-dot" id="cs-mic-dot"></span>
               <span id="cs-mic-btn-label">Start listening</span>
             </button>
-            <span style="font-size:11px;color:var(--muted2);">Captures your microphone — speak naturally</span>
+            <span style="font-size:11px;color:var(--muted2);max-width:340px;line-height:1.45;">Transcribes <strong>your</strong> mic (what you say in the room). It does not tap the phone line — the other person is only captured if their voice is picked up by your mic (e.g. speakerphone).</span>
           </div>
           <div class="cs-transcript-scroll" id="cs-transcript">
             <div class="cs-tx-empty" id="cs-tx-empty">Press "Start listening" to begin transcribing the call in real-time.</div>
@@ -1056,26 +1058,70 @@ function getWorkerUrl(){ return (localStorage.getItem('mss_worker_url')||'').rep
 function getPlacesKey(){ return localStorage.getItem('mss_places_key')||''; }
 function getGeminiKey(){ return localStorage.getItem('mss_gemini_key')||''; }
 function usingWorker(){ return !!getWorkerUrl(); }
+function hasGeminiAccess(){ return usingWorker() || !!getGeminiKey(); }
+
+const LEGACY_PLACES_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
 
 // Unified Gemini caller — routes through Worker if configured, else direct
 async function callGemini(payload){
   const wurl = getWorkerUrl();
+  const model = payload.model || 'gemini-2.0-flash';
+  const { model:_drop, ...body } = payload;
   if(wurl){
     const res = await fetch(wurl+'/gemini',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
+      body: JSON.stringify({model,...body})
     });
-    return res.json();
+    const d = await res.json();
+    if(d.error) throw new Error(d.error.message || d.error.status || (typeof d.error==='string'?d.error:JSON.stringify(d.error)));
+    if(!res.ok) throw new Error('Worker /gemini request failed');
+    return d;
   }
-  // Fallback: direct call with browser key
   const gk = getGeminiKey();
   if(!gk) throw new Error('No Gemini key. Add one in ⚙ Settings → API Keys or connect a Cloudflare Worker.');
-  const model = payload.model || 'gemini-2.0-flash';
-  const { model:_m, ...body } = payload;
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${gk}`,{
     method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
   });
-  return res.json();
+  const d = await res.json();
+  if(d.error) throw new Error(d.error.message || d.error.status || JSON.stringify(d.error));
+  return d;
+}
+
+function parseGeminiJsonObject(rawText){
+  const clean = String(rawText||'').replace(/```json|```/g,'').trim();
+  try { return JSON.parse(clean); } catch(e) {}
+  const m = clean.match(/\{[\s\S]*\}/);
+  if(m) try { return JSON.parse(m[0]); } catch(e2) {}
+  throw new Error('Could not parse AI response as JSON');
+}
+function parseGeminiJsonArray(rawText){
+  const clean = String(rawText||'').replace(/```json|```/g,'').trim();
+  let parsed;
+  try { parsed = JSON.parse(clean); } catch(e) {}
+  if(!Array.isArray(parsed)){
+    const m = clean.match(/\[[\s\S]*\]/);
+    if(m) try { parsed = JSON.parse(m[0]); } catch(e2) {}
+  }
+  if(!Array.isArray(parsed)) throw new Error('Could not parse AI response as JSON array');
+  return parsed;
+}
+
+function reviewSnippetsFromDetails(det){
+  const revs = det && (det.reviews || det.result?.reviews);
+  if(!revs || !revs.length) return [];
+  return revs.slice(0,5).map(r=>{
+    const t = String((r && r.text) || '').trim();
+    if(!t) return '';
+    return t.length > 220 ? t.slice(0,217)+'…' : t;
+  }).filter(Boolean);
+}
+
+function normalizeGeoLocation(loc){
+  if(!loc) return null;
+  const lat = typeof loc.lat === 'function' ? loc.lat() : Number(loc.lat);
+  const lng = typeof loc.lng === 'function' ? loc.lng() : Number(loc.lng);
+  if(Number.isNaN(lat) || Number.isNaN(lng)) return null;
+  return { lat, lng };
 }
 
 function checkKey(){
@@ -1136,33 +1182,6 @@ function load(){
 function save(){try{localStorage.setItem(SK,JSON.stringify({leads,nextId,services:customServices,svcNextId}));}catch(e){}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ── KEYS ──────────────────────────────────────────────────────────────────────
-function getPlacesKey(){return localStorage.getItem('mss_places_key')||'';}
-function getGeminiKey(){return localStorage.getItem('mss_gemini_key')||'';}
-function checkKey(){
-  const pk=getPlacesKey(), gk=getGeminiKey();
-  const pOk=!!pk, gOk=!!gk;
-  // Topbar indicator
-  const tb=document.getElementById('topbar-key-status');
-  // Settings indicator
-  const sk=document.getElementById('settings-key-status');
-  if(pOk&&gOk){
-    if(tb){tb.textContent='✓ Keys active';tb.className='key-indicator ok';}
-    if(sk){sk.textContent='Both keys active';sk.className='key-indicator ok';}
-  }else if(pOk){
-    if(tb){tb.textContent='⚠ Gemini key missing';tb.className='key-indicator partial';}
-    if(sk){sk.textContent='Places key active';sk.className='key-indicator partial';}
-  }else{
-    if(tb){tb.textContent='⚠ Keys not set';tb.className='key-indicator empty';}
-    if(sk){sk.textContent='No keys set';sk.className='key-indicator empty';}
-  }
-  // Populate settings inputs with masked placeholders if keys exist
-  const pi=document.getElementById('s-places-key');
-  const gi=document.getElementById('s-gemini-key');
-  if(pi&&!pi.value&&pk)pi.placeholder='(key saved — enter new to replace)';
-  if(gi&&!gi.value&&gk)gi.placeholder='(key saved — enter new to replace)';
-}
-
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(t){
   const tabs=['scanner','tracker','demo','settings','callscript'];
@@ -1184,17 +1203,26 @@ async function geocode(city){
   if(wurl){
     const r = await fetch(`${wurl}/geocode?city=${encodeURIComponent(city)}`);
     const d = await r.json();
-    if(d.status!=='OK') throw new Error('Could not find location. Try "City, State".');
-    return d.results[0].geometry.location;
+    if(!r.ok || d.error) throw new Error(typeof d.error==='string' ? d.error : (d.error && d.error.message) || 'Geocoding failed. Check Worker URL and PLACES_KEY secret.');
+    if(d.status!=='OK' || !d.results?.length){
+      const hint = d.status==='ZERO_RESULTS' ? 'No results for that location.' : (d.error_message || 'Could not find location. Try "City, State" or a full address.');
+      throw new Error(hint);
+    }
+    const loc = normalizeGeoLocation(d.results[0].geometry.location);
+    if(!loc) throw new Error('Invalid location from geocoder.');
+    return loc;
   }
-  // Fallback: old proxy
   const key = getPlacesKey();
   if(!key) throw new Error('No Places API key. Add one in ⚙ Settings or connect a Worker.');
-  const LEGACY_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
-  const r = await fetch(LEGACY_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${key}`));
+  const r = await fetch(LEGACY_PLACES_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${key}`));
   const d = await r.json();
-  if(d.status!=='OK') throw new Error('Could not find location. Try "City, State".');
-  return d.results[0].geometry.location;
+  if(!r.ok || d.error_message) throw new Error(d.error_message || 'Geocoding request failed.');
+  if(d.status!=='OK' || !d.results?.length){
+    throw new Error(d.status==='ZERO_RESULTS' ? 'No results for that location.' : 'Could not find location. Try "City, State".');
+  }
+  const loc = normalizeGeoLocation(d.results[0].geometry.location);
+  if(!loc) throw new Error('Invalid location from geocoder.');
+  return loc;
 }
 
 async function placesSearch(lat,lng,radius,kw){
@@ -1206,10 +1234,9 @@ async function placesSearch(lat,lng,radius,kw){
   }
   const key = getPlacesKey();
   if(!key) throw new Error('No Places API key.');
-  const LEGACY_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
   const base=`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&key=${key}`;
   const url = kw ? base+`&keyword=${encodeURIComponent(kw)}` : base+`&type=establishment`;
-  const r = await fetch(LEGACY_PROXY+'?url='+encodeURIComponent(url));
+  const r = await fetch(LEGACY_PLACES_PROXY+'?url='+encodeURIComponent(url));
   return r.json();
 }
 
@@ -1222,8 +1249,7 @@ async function getDetails(pid){
   }
   const key = getPlacesKey();
   if(!key) return {};
-  const LEGACY_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
-  const r = await fetch(LEGACY_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${pid}&fields=name,formatted_phone_number,website,rating,user_ratings_total,formatted_address&key=${key}`));
+  const r = await fetch(LEGACY_PLACES_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${pid}&fields=name,formatted_phone_number,website,rating,user_ratings_total,formatted_address,reviews&key=${key}`));
   const d = await r.json();
   return d.result||{};
 }
@@ -1350,8 +1376,13 @@ async function runScan(){
     if(data.status==='ZERO_RESULTS'||!data.results?.length){document.getElementById('loader').classList.remove('active');document.getElementById('scan-empty').classList.add('show');return;}
     document.getElementById('loader-msg').textContent=`Loading details for ${data.results.length} businesses...`;
     const detailed=await Promise.all(data.results.slice(0,20).map(async p=>{
-      try{const det=await getDetails(p.place_id);return{name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
-      catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};}
+      try{
+        const det=await getDetails(p.place_id);
+        const rs=reviewSnippetsFromDetails(det);
+        return{placeId:p.place_id,reviewSnippets:rs,name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};
+      }catch(e){
+        return{placeId:p.place_id,reviewSnippets:[],name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};
+      }
     }));
     scanResults=detailed;visibleResults=detailed;
     document.getElementById('loader').classList.remove('active');
@@ -1360,7 +1391,7 @@ async function runScan(){
     const _s=getSettings();
     if(_s.autoFilterNoWeb){document.getElementById('f-sort').value='no_web';applyFilters();}
     if(_s.autoAddTracker){detailed.forEach((_,i)=>addOne(i));updateTrackerCount();}
-    if(kw&&(usingWorker()||getGeminiKey())){aiScoreResults(kw,detailed);}
+    if(kw&&hasGeminiAccess()){aiScoreResults(kw,detailed);}
   }catch(e){
     document.getElementById('loader').classList.remove('active');
     showError(e.message||'Something went wrong. Check your configuration and try again.');
@@ -1370,7 +1401,7 @@ async function runScan(){
 // ── AI RELEVANCE SCORING ──────────────────────────────────────────────────────
 async function aiScoreResults(searchType,results){
   if(!results.length)return;
-  if(!usingWorker()&&!getGeminiKey())return;
+  if(!hasGeminiAccess())return;
   const bar=document.getElementById('ai-filter-bar');
   const msg=document.getElementById('ai-filter-msg');
   const spinner=document.getElementById('ai-filter-spinner');
@@ -1396,10 +1427,9 @@ Businesses:
 ${list}`;
 
   try{
-    const d=await callGemini({contents:[{parts:[{text:prompt}]}]});
+    const d=await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:prompt}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'[]';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const scores=JSON.parse(clean);
+    const scores=parseGeminiJsonArray(raw);
     scores.forEach(s=>{
       if(scanResults[s.index]){
         scanResults[s.index].aiScore=s.score;
@@ -1512,8 +1542,13 @@ async function runBulkScan(){
       if(data.results?.length){
         const det=await Promise.all(data.results.slice(0,20).map(async p=>{
           if(seenNames.has(p.name.toLowerCase()))return null;
-          try{const d=await getDetails(p.place_id);return{name:p.name,phone:d.formatted_phone_number||'',website:d.website||'',address:d.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
-          catch(e){return{name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};}
+          try{
+            const d=await getDetails(p.place_id);
+            const rs=reviewSnippetsFromDetails(d);
+            return{placeId:p.place_id,reviewSnippets:rs,name:p.name,phone:d.formatted_phone_number||'',website:d.website||'',address:d.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};
+          }catch(e){
+            return{placeId:p.place_id,reviewSnippets:[],name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};
+          }
         }));
         det.filter(Boolean).forEach(p=>{if(!seenNames.has(p.name.toLowerCase())){seenNames.add(p.name.toLowerCase());allResults.push(p);}});
       }
@@ -1629,6 +1664,8 @@ function addService(){
 // ── DEMO PREVIEW ──────────────────────────────────────────────────────────────
 function getDemoValues(){
   const heroColor=document.querySelector('input[name="hero-color"]:checked')?.value||'#f0e6d8';
+  const reviewHighlights=document.getElementById('d-review-highlights')?.value.trim()||'';
+  const googleRating=document.getElementById('d-google-rating')?.value.trim()||'';
   return{
     name:document.getElementById('d-name').value.trim()||'[SPA NAME]',
     tagline:document.getElementById('d-tagline').value.trim()||'[TAGLINE]',
@@ -1636,6 +1673,8 @@ function getDemoValues(){
     phone:document.getElementById('d-phone').value.trim()||'[PHONE]',
     email:document.getElementById('d-email').value.trim()||'[EMAIL]',
     address:document.getElementById('d-address').value.trim()||'[ADDRESS]',
+    reviewHighlights,
+    googleRating,
     heroColor,
     services:customServices.filter(s=>s.enabled)
   };
@@ -1661,7 +1700,7 @@ function updatePreview(){
 async function pasteAutoFill(){
   const text=document.getElementById('paste-box').value.trim();
   if(!text){addAIMsg('assistant','Please paste some spa information in the box first.');return;}
-  if(!usingWorker()&&!getGeminiKey()){addAIMsg('assistant','Add a Cloudflare Worker or Gemini key in ⚙ Settings.');switchTab('settings');return;}
+  if(!hasGeminiAccess()){addAIMsg('assistant','Add a Cloudflare Worker URL or Gemini key in ⚙ Settings.');switchTab('settings');return;}
   addAIMsg('assistant','Reading the pasted info and filling the form...');
   const prompt=`Extract spa business details from this text and return ONLY valid JSON, no markdown, no explanation:
 {"name":"","tagline":"","city":"","phone":"","email":"","address":"","services":[{"name":"","price":"","unit":""}]}
@@ -1676,10 +1715,9 @@ Rules:
 Text to extract from:
 ${text}`;
   try{
-    const d=await callGemini({contents:[{parts:[{text:prompt}]}]});
+    const d=await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:prompt}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
+    const parsed=parseGeminiJsonObject(raw);
     if(parsed.name)document.getElementById('d-name').value=parsed.name;
     if(parsed.tagline)document.getElementById('d-tagline').value=parsed.tagline;
     if(parsed.city)document.getElementById('d-city').value=parsed.city;
@@ -1694,7 +1732,7 @@ ${text}`;
     }
     updatePreview();
     addAIMsg('assistant',`Done! Filled in the demo form for "${parsed.name||'the spa'}". Check the form and adjust anything before generating.`);
-  }catch(e){addAIMsg('assistant','Could not parse the info. Try pasting just the business name, city, phone, and services.');}
+  }catch(e){addAIMsg('assistant','Could not parse the info: '+(e.message||e)+'. Try simpler text or check your Gemini / Worker setup.');}
 }
 
 // ── FILL DEMO FROM RESULT ─────────────────────────────────────────────────────
@@ -1706,6 +1744,10 @@ function fillDemoFromResult(i){
   document.getElementById('d-city').value=city||'';
   document.getElementById('d-phone').value=p.phone||'';
   document.getElementById('d-address').value=p.address||'';
+  const gr=document.getElementById('d-google-rating');
+  const rh=document.getElementById('d-review-highlights');
+  if(gr) gr.value = (p.rating!=null && p.rating!=='') ? String(p.rating) : '';
+  if(rh) rh.value = (p.reviewSnippets && p.reviewSnippets.length) ? p.reviewSnippets.join('\n\n---\n\n') : '';
   renderServiceList();updatePreview();
   addAIMsg('assistant',`Filled demo form with details for "${p.name}". Switch to the Demo Builder tab to review and generate.`);
 }
@@ -1714,6 +1756,16 @@ function fillDemoFromResult(i){
 function generateDemo(){
   const v=getDemoValues();
   if(v.name==='[SPA NAME]'){alert('Please enter a spa name first.');return;}
+  const ratingStar=v.googleRating?esc(v.googleRating)+'★':'4.9★';
+  const reviewBlocks=v.reviewHighlights?v.reviewHighlights.split(/\n+---\n+/).filter(Boolean).map(q=>`<blockquote class="review-card">&ldquo;${esc(q).replace(/\n/g,'<br>')}&rdquo;</blockquote>`).join(''):'';
+  const reviewsSection=reviewBlocks?`<section class="reviews-strip" id="reviews">
+  <div class="section-inner">
+    <p class="section-label">Social proof</p>
+    <h2 class="section-title">What clients say</h2>
+    <p class="section-sub">Highlights from Google Places reviews.</p>
+    <div class="review-grid">${reviewBlocks}</div>
+  </div>
+</section>`:'';
   const serviceCards=v.services.map(s=>`
       <div class="service-card">
         <div class="service-icon">${s.icon}</div>
@@ -1804,11 +1856,14 @@ footer{background:var(--brown);color:rgba(253,248,243,0.7);padding:3rem;text-ali
 .success-msg{display:none;background:#edf7f0;border:1px solid #8fcca0;border-radius:8px;padding:14px 18px;font-size:14px;color:#2d6e45;margin-top:12px;text-align:center;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 .fade-up{animation:fadeUp 0.7s ease both;}.fade-up-2{animation:fadeUp 0.7s ease 0.15s both;}.fade-up-3{animation:fadeUp 0.7s ease 0.3s both;}.fade-up-4{animation:fadeUp 0.7s ease 0.45s both;}
+.reviews-strip{background:linear-gradient(180deg,rgba(245,237,224,0.5),transparent);border-bottom:1px solid rgba(212,168,154,0.15);}
+.review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;}
+.review-card{background:white;border-radius:var(--r);padding:1.5rem;border:1px solid rgba(212,168,154,0.2);font-size:14px;color:var(--muted);line-height:1.75;font-style:italic;}
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}section{padding:4rem 1.5rem;}.hero{padding:6rem 1.5rem 3rem;}.contact-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}}
 </style></head><body>
 <nav>
   <div class="nav-logo">${v.name}</div>
-  <ul class="nav-links"><li><a href="#services">Services</a></li><li><a href="#gallery">Results</a></li><li><a href="#contact">Contact</a></li></ul>
+  <ul class="nav-links"><li><a href="#services">Services</a></li>${reviewBlocks?'<li><a href="#reviews">Reviews</a></li>':''}<li><a href="#gallery">Results</a></li><li><a href="#contact">Contact</a></li></ul>
   <button class="nav-book" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Book Now</button>
 </nav>
 <section class="hero">
@@ -1822,11 +1877,12 @@ footer{background:var(--brown);color:rgba(253,248,243,0.7);padding:3rem;text-ali
     </div>
     <div class="hero-trust fade-up-4">
       <div class="trust-item"><div class="trust-num">500+</div><div class="trust-label">Happy clients</div></div>
-      <div class="trust-item"><div class="trust-num">4.9&#9733;</div><div class="trust-label">Google rating</div></div>
+      <div class="trust-item"><div class="trust-num">${ratingStar}</div><div class="trust-label">Google rating</div></div>
       <div class="trust-item"><div class="trust-num">5yr</div><div class="trust-label">Experience</div></div>
     </div>
   </div>
 </section>
+${reviewsSection}
 <section class="services-bg" id="services">
   <div class="section-inner">
     <p class="section-label">What we offer</p>
@@ -1895,7 +1951,8 @@ function addAIMsg(role,text){
   const msgs=document.getElementById('ai-messages');
   const div=document.createElement('div');
   div.className=`ai-msg ${role}`;
-  div.innerHTML=text.replace(/\n/g,'<br>');
+  const t=String(text||'');
+  div.innerHTML=esc(t).replace(/\n/g,'<br>');
   msgs.appendChild(div);
   msgs.scrollTop=msgs.scrollHeight;
   return div;
@@ -1906,7 +1963,7 @@ async function sendAI(msg){
   document.getElementById('ai-input').value='';
   addAIMsg('user',msg);
   const thinking=addAIMsg('assistant thinking','Thinking...');
-  if(!usingWorker()&&!getGeminiKey()){thinking.textContent='Add a Cloudflare Worker or Gemini key in ⚙ Settings.';thinking.className='ai-msg assistant';switchTab('settings');return;}
+  if(!hasGeminiAccess()){thinking.textContent='Add a Cloudflare Worker URL or Gemini key in ⚙ Settings.';thinking.className='ai-msg assistant';switchTab('settings');return;}
 
   // Build app state context
   const state={
@@ -1944,13 +2001,12 @@ Return ONLY valid JSON: {"actions":[...],"reply":"your friendly reply to the use
 No markdown, no explanation outside the JSON.`;
 
   try{
-    const d=await callGemini({contents:[{parts:[{text:systemPrompt+'\n\nUser says: '+msg}]}]});
-    const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
-    thinking.textContent='';thinking.className='ai-msg assistant';
+    const d=await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:systemPrompt+'\n\nUser says: '+msg}]}]});
+    const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    if(!raw.trim()) throw new Error((d.promptFeedback&&JSON.stringify(d.promptFeedback))||'Empty response from Gemini. Check GEMINI_KEY on the Worker or your browser key.');
+    const parsed=parseGeminiJsonObject(raw);
+    thinking.remove();
 
-    // Execute actions
     for(const act of (parsed.actions||[])){
       switch(act.action){
         case 'switchTab': switchTab(act.tab);break;
@@ -1972,10 +2028,12 @@ No markdown, no explanation outside the JSON.`;
         case 'exportCSV': exportCSV();break;
       }
     }
-    if(parsed.reply)addAIMsg('assistant',parsed.reply);
+    const reply = (parsed.reply!=null && String(parsed.reply).trim()) ? String(parsed.reply).trim()
+      : ((parsed.actions||[]).length ? 'Done.' : 'I could not produce a reply. Try asking again in plain language.');
+    addAIMsg('assistant',reply);
   }catch(e){
-    thinking.textContent='Sorry, something went wrong. Check your Gemini key and try again.';
     thinking.className='ai-msg assistant';
+    thinking.textContent='Sorry — '+(e.message||'something went wrong. Check Settings and try again.');
   }
 }
 
@@ -2368,14 +2426,13 @@ function clearTranscript(){
 }
 
 function scheduleAiAnalysis(){
-  if(!getGeminiKey()) return;
+  if(!hasGeminiAccess()) return;
   clearTimeout(aiAnalysisTimer);
   aiAnalysisTimer = setTimeout(()=>runAiAnalysis(), AI_DEBOUNCE_MS);
 }
 
 async function runAiAnalysis(){
-  const gk = getGeminiKey();
-  if(!gk || transcriptLines.length === 0) return;
+  if(!hasGeminiAccess() || transcriptLines.length === 0) return;
   // Only analyse if there's new content
   if(transcriptLines.length === lastAnalysedLength) return;
   lastAnalysedLength = transcriptLines.length;
@@ -2414,10 +2471,9 @@ Rules:
 - If there's genuinely nothing to report for a field, use empty array [] or null`;
 
   try{
-    const d = await callGemini({contents:[{parts:[{text:prompt}]}]});
-    const raw = d.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const clean = raw.replace(/```json|```/g,'').trim();
-    const analysis = JSON.parse(clean);
+    const d = await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:prompt}]}]});
+    const raw = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const analysis = parseGeminiJsonObject(raw);
 
     document.getElementById('cs-obj-thinking').classList.remove('show');
 

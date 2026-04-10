@@ -101,7 +101,7 @@ export default {
         const placeId = p.get('place_id');
         if (!placeId) return err('Missing ?place_id parameter');
 
-        const fields = 'name,formatted_phone_number,website,rating,user_ratings_total,formatted_address';
+        const fields = 'name,formatted_phone_number,website,rating,user_ratings_total,formatted_address,reviews';
         const apiUrl = `https://maps.googleapis.com/maps/api/place/details/json`
           + `?place_id=${encodeURIComponent(placeId)}&fields=${fields}&key=${env.PLACES_KEY}`;
 
