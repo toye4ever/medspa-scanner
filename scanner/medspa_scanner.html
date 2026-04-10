@@ -1049,6 +1049,11 @@ const SK_SETTINGS = 'mss_settings_v1';
 const DEFAULT_BULK_KEYWORDS = ['med spa','botox clinic','laser hair removal','aesthetic clinic','skin rejuvenation','lip filler clinic'];
 let BULK_KEYWORDS = [...DEFAULT_BULK_KEYWORDS];
 const SERVICE_ICONS = ['✦','◈','◇','❋','◉','✿','❖','◆','✤','❀'];
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const PLACES_DETAIL_CONCURRENCY = 5;
+const AI_ASSISTANT_SCAN_MAX = 25;
+const AI_ASSISTANT_TRACKER_MAX = 80;
+const CALL_SCRIPT_TRANSCRIPT_MAX_LINES = 50;
 
 let leads = [], nextId = 1, scanResults = [], visibleResults = [];
 
@@ -1059,22 +1064,48 @@ function getPlacesKey(){ return localStorage.getItem('mss_places_key')||''; }
 function getGeminiKey(){ return localStorage.getItem('mss_gemini_key')||''; }
 function usingWorker(){ return !!getWorkerUrl(); }
 function hasGeminiAccess(){ return usingWorker() || !!getGeminiKey(); }
+function hasPlacesAccess(){ return usingWorker() || !!getPlacesKey(); }
 
 const LEGACY_PLACES_PROXY = 'https://places-proxy.oluwatoye05.workers.dev/';
 
-// Unified Gemini caller — routes through Worker if configured, else direct
-async function callGemini(payload){
+// Serialize Gemini calls so assistant + call-script coach + scan scoring don’t burst the API (avoids 429)
+let geminiChain = Promise.resolve();
+function enqueueGemini(fn){
+  const job = geminiChain.then(()=>fn());
+  geminiChain = job.catch(()=>{});
+  return job;
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function geminiLooksRateLimited(res,d){
+  if(res && res.status===429) return true;
+  const e = d && d.error;
+  if(!e) return false;
+  if(e.code===429) return true;
+  if(e.status==='RESOURCE_EXHAUSTED') return true;
+  const msg = String(e.message||'').toLowerCase();
+  return msg.includes('resource exhausted')||msg.includes('quota')||msg.includes('rate limit')||msg.includes('too many requests');
+}
+
+async function callGeminiOnce(payload){
   const wurl = getWorkerUrl();
-  const model = payload.model || 'gemini-2.0-flash';
+  const model = payload.model || GEMINI_MODEL;
   const { model:_drop, ...body } = payload;
   if(wurl){
     const res = await fetch(wurl+'/gemini',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({model,...body})
     });
-    const d = await res.json();
+    const d = await res.json().catch(()=>({}));
+    const rateLimited = geminiLooksRateLimited(res,d);
+    if(rateLimited){
+      const err = new Error(d.error?.message || 'Gemini rate limit (429). Too many requests — wait a moment and try again.');
+      err.geminiRateLimited = true;
+      throw err;
+    }
     if(d.error) throw new Error(d.error.message || d.error.status || (typeof d.error==='string'?d.error:JSON.stringify(d.error)));
-    if(!res.ok) throw new Error('Worker /gemini request failed');
+    if(!res.ok) throw new Error('Worker /gemini request failed ('+res.status+')');
     return d;
   }
   const gk = getGeminiKey();
@@ -1082,9 +1113,37 @@ async function callGemini(payload){
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${gk}`,{
     method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
   });
-  const d = await res.json();
+  const d = await res.json().catch(()=>({}));
+  if(geminiLooksRateLimited(res,d)){
+    const err = new Error(d.error?.message || 'Gemini rate limit (429). Too many requests — wait a moment and try again.');
+    err.geminiRateLimited = true;
+    throw err;
+  }
   if(d.error) throw new Error(d.error.message || d.error.status || JSON.stringify(d.error));
   return d;
+}
+
+const GEMINI_MAX_RETRIES = 4;
+const GEMINI_BACKOFF_BASE_MS = 1800;
+
+// Unified Gemini caller — queue + retry on 429 / RESOURCE_EXHAUSTED
+function callGemini(payload){
+  return enqueueGemini(async()=>{
+    let lastErr;
+    for(let attempt=0; attempt<GEMINI_MAX_RETRIES; attempt++){
+      try{ return await callGeminiOnce(payload); }
+      catch(e){
+        lastErr = e;
+        if(e && e.geminiRateLimited && attempt<GEMINI_MAX_RETRIES-1){
+          const delay = Math.min(45e3, GEMINI_BACKOFF_BASE_MS * Math.pow(2, attempt));
+          await sleep(delay);
+          continue;
+        }
+        throw e;
+      }
+    }
+    throw lastErr;
+  });
 }
 
 function parseGeminiJsonObject(rawText){
@@ -1202,7 +1261,7 @@ async function geocode(city){
   const wurl = getWorkerUrl();
   if(wurl){
     const r = await fetch(`${wurl}/geocode?city=${encodeURIComponent(city)}`);
-    const d = await r.json();
+    const d = await r.json().catch(()=>({}));
     if(!r.ok || d.error) throw new Error(typeof d.error==='string' ? d.error : (d.error && d.error.message) || 'Geocoding failed. Check Worker URL and PLACES_KEY secret.');
     if(d.status!=='OK' || !d.results?.length){
       const hint = d.status==='ZERO_RESULTS' ? 'No results for that location.' : (d.error_message || 'Could not find location. Try "City, State" or a full address.');
@@ -1230,7 +1289,9 @@ async function placesSearch(lat,lng,radius,kw){
   if(wurl){
     const qs = `lat=${lat}&lng=${lng}&radius=${radius}${kw?'&keyword='+encodeURIComponent(kw):''}`;
     const r = await fetch(`${wurl}/places?${qs}`);
-    return r.json();
+    const d = await r.json();
+    if(!r.ok || d.error) throw new Error(typeof d.error==='string' ? d.error : (d.error && d.error.message) || 'Places search failed. Check Worker and PLACES_KEY.');
+    return d;
   }
   const key = getPlacesKey();
   if(!key) throw new Error('No Places API key.');
@@ -1244,14 +1305,43 @@ async function getDetails(pid){
   const wurl = getWorkerUrl();
   if(wurl){
     const r = await fetch(`${wurl}/details?place_id=${encodeURIComponent(pid)}`);
-    const d = await r.json();
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok || d.error) return {};
     return d.result || d;
   }
   const key = getPlacesKey();
   if(!key) return {};
   const r = await fetch(LEGACY_PLACES_PROXY+'?url='+encodeURIComponent(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${pid}&fields=name,formatted_phone_number,website,rating,user_ratings_total,formatted_address,reviews&key=${key}`));
-  const d = await r.json();
+  const d = await r.json().catch(()=>({}));
   return d.result||{};
+}
+
+async function mapWithConcurrency(items, limit, asyncMapper){
+  if(!items.length) return [];
+  const results = new Array(items.length);
+  let i = 0;
+  async function worker(){
+    for(;;){
+      const idx = i++;
+      if(idx >= items.length) break;
+      results[idx] = await asyncMapper(items[idx], idx);
+    }
+  }
+  const n = Math.min(Math.max(1, limit), items.length);
+  await Promise.all(Array.from({length:n}, ()=>worker()));
+  return results;
+}
+
+async function enrichNearbyPlace(p, withAi){
+  try{
+    const det = await getDetails(p.place_id);
+    const rs = reviewSnippetsFromDetails(det);
+    const base = {placeId:p.place_id,reviewSnippets:rs,name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};
+    return withAi ? {...base,aiScore:null,aiLabel:''} : base;
+  }catch(e){
+    const base = {placeId:p.place_id,reviewSnippets:[],name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};
+    return withAi ? {...base,aiScore:null,aiLabel:''} : base;
+  }
 }
 
 // ── WEBSITE SCORE ────────────────────────────────────────────────────────────
@@ -1352,7 +1442,7 @@ function renderCards(places){
 
 // ── SCAN ──────────────────────────────────────────────────────────────────────
 async function runScan(){
-  if(!usingWorker()&&!getPlacesKey()){showError('Add a Cloudflare Worker URL or Places API key in ⚙ Settings.');switchTab('settings');return;}
+  if(!hasPlacesAccess()){showError('Add a Cloudflare Worker URL or Places API key in ⚙ Settings.');switchTab('settings');return;}
   const city=document.getElementById('s-city').value.trim();
   if(!city){showError('Enter a city or area to search.');return;}
   closeSuggestions();
@@ -1375,15 +1465,7 @@ async function runScan(){
     if(data.status==='REQUEST_DENIED')throw new Error('API key rejected. Check Places API and Geocoding API are enabled.');
     if(data.status==='ZERO_RESULTS'||!data.results?.length){document.getElementById('loader').classList.remove('active');document.getElementById('scan-empty').classList.add('show');return;}
     document.getElementById('loader-msg').textContent=`Loading details for ${data.results.length} businesses...`;
-    const detailed=await Promise.all(data.results.slice(0,20).map(async p=>{
-      try{
-        const det=await getDetails(p.place_id);
-        const rs=reviewSnippetsFromDetails(det);
-        return{placeId:p.place_id,reviewSnippets:rs,name:p.name,phone:det.formatted_phone_number||'',website:det.website||'',address:det.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};
-      }catch(e){
-        return{placeId:p.place_id,reviewSnippets:[],name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0,aiScore:null,aiLabel:''};
-      }
-    }));
+    const detailed=await mapWithConcurrency(data.results.slice(0,20),PLACES_DETAIL_CONCURRENCY,(p)=>enrichNearbyPlace(p,true));
     scanResults=detailed;visibleResults=detailed;
     document.getElementById('loader').classList.remove('active');
     document.getElementById('filter-bar').classList.add('show');
@@ -1427,7 +1509,7 @@ Businesses:
 ${list}`;
 
   try{
-    const d=await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:prompt}]}]});
+    const d=await callGemini({model:GEMINI_MODEL,contents:[{parts:[{text:prompt}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'[]';
     const scores=parseGeminiJsonArray(raw);
     scores.forEach(s=>{
@@ -1515,7 +1597,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search-type-wrap'))
 
 // ── BULK SCAN ────────────────────────────────────────────────────────────────
 async function runBulkScan(){
-  if(!usingWorker()&&!getPlacesKey()){showError('Add a Cloudflare Worker URL or Places API key in ⚙ Settings.');switchTab('settings');return;}
+  if(!hasPlacesAccess()){showError('Add a Cloudflare Worker URL or Places API key in ⚙ Settings.');switchTab('settings');return;}
   const city=document.getElementById('s-city').value.trim();
   if(!city){showError('Enter a city or area to search.');return;}
   const radius=document.getElementById('s-radius').value;
@@ -1540,16 +1622,10 @@ async function runBulkScan(){
     try{
       const data=await placesSearch(loc.lat,loc.lng,radius,kw);
       if(data.results?.length){
-        const det=await Promise.all(data.results.slice(0,20).map(async p=>{
+        const det=await mapWithConcurrency(data.results.slice(0,20),PLACES_DETAIL_CONCURRENCY,async p=>{
           if(seenNames.has(p.name.toLowerCase()))return null;
-          try{
-            const d=await getDetails(p.place_id);
-            const rs=reviewSnippetsFromDetails(d);
-            return{placeId:p.place_id,reviewSnippets:rs,name:p.name,phone:d.formatted_phone_number||'',website:d.website||'',address:d.formatted_address||p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};
-          }catch(e){
-            return{placeId:p.place_id,reviewSnippets:[],name:p.name,phone:'',website:'',address:p.vicinity||'',rating:p.rating||0,reviews:p.user_ratings_total||0};
-          }
-        }));
+          return enrichNearbyPlace(p,false);
+        });
         det.filter(Boolean).forEach(p=>{if(!seenNames.has(p.name.toLowerCase())){seenNames.add(p.name.toLowerCase());allResults.push(p);}});
       }
     }catch(e){}
@@ -1715,7 +1791,7 @@ Rules:
 Text to extract from:
 ${text}`;
   try{
-    const d=await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:prompt}]}]});
+    const d=await callGemini({model:GEMINI_MODEL,contents:[{parts:[{text:prompt}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
     const parsed=parseGeminiJsonObject(raw);
     if(parsed.name)document.getElementById('d-name').value=parsed.name;
@@ -1965,20 +2041,23 @@ async function sendAI(msg){
   const thinking=addAIMsg('assistant thinking','Thinking...');
   if(!hasGeminiAccess()){thinking.textContent='Add a Cloudflare Worker URL or Gemini key in ⚙ Settings.';thinking.className='ai-msg assistant';switchTab('settings');return;}
 
-  // Build app state context
+  const scanShown=scanResults.slice(0,AI_ASSISTANT_SCAN_MAX);
+  const leadsShown=leads.slice(0,AI_ASSISTANT_TRACKER_MAX);
   const state={
     currentTab:document.querySelector('.tab.active')?.textContent?.trim(),
     scanResultsCount:scanResults.length,
-    scanResults:scanResults.map((p,i)=>({index:i,name:p.name,city:(p.address||'').split(',')[1]?.trim()||'',phone:p.phone,website:p.website,rating:p.rating,reviews:p.reviews,hasWebsite:!!p.website,isSocialOnly:!!(p.website&&(p.website.includes('facebook')||p.website.includes('instagram')))})),
-    trackerLeads:leads.map(l=>({id:l.id,name:l.name,status:l.status,city:l.city})),
+    scanResultsOmitted:Math.max(0,scanResults.length-scanShown.length),
+    scanResults:scanShown.map((p,i)=>({index:i,name:p.name,city:(p.address||'').split(',')[1]?.trim()||'',phone:p.phone,website:p.website,rating:p.rating,reviews:p.reviews,hasWebsite:!!p.website,isSocialOnly:!!(p.website&&(p.website.includes('facebook')||p.website.includes('instagram')))})),
     trackerCount:leads.length,
+    trackerLeadsOmitted:Math.max(0,leads.length-leadsShown.length),
+    trackerLeads:leadsShown.map(l=>({id:l.id,name:l.name,status:l.status,city:l.city})),
     demoForm:{name:document.getElementById('d-name')?.value,city:document.getElementById('d-city')?.value},
     currentFilters:{website:document.getElementById('f-web-filter')?.value,ratingMin:document.getElementById('f-rating-min')?.value,sort:document.getElementById('f-sort')?.value}
   };
 
   const systemPrompt=`You are an AI assistant built into a med spa lead generation app. You can control the app by returning JSON actions.
 
-App state:
+App state (scanResults are only the first ${AI_ASSISTANT_SCAN_MAX} rows; indices 0..${AI_ASSISTANT_SCAN_MAX-1} match the scanner. trackerLeads are capped at ${AI_ASSISTANT_TRACKER_MAX}; use trackerCount for total):
 ${JSON.stringify(state,null,2)}
 
 Available actions (return as JSON array):
@@ -2001,7 +2080,7 @@ Return ONLY valid JSON: {"actions":[...],"reply":"your friendly reply to the use
 No markdown, no explanation outside the JSON.`;
 
   try{
-    const d=await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:systemPrompt+'\n\nUser says: '+msg}]}]});
+    const d=await callGemini({model:GEMINI_MODEL,contents:[{parts:[{text:systemPrompt+'\n\nUser says: '+msg}]}]});
     const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
     if(!raw.trim()) throw new Error((d.promptFeedback&&JSON.stringify(d.promptFeedback))||'Empty response from Gemini. Check GEMINI_KEY on the Worker or your browser key.');
     const parsed=parseGeminiJsonObject(raw);
@@ -2326,7 +2405,7 @@ let interimEl = null;
 let aiAnalysisTimer = null;
 let objectionHistory = [];
 let lastAnalysedLength = 0;
-const AI_DEBOUNCE_MS = 5000;    // analyse 5s after last speech segment
+const AI_DEBOUNCE_MS = 8000;    // analyse 8s after last speech segment (fewer Gemini calls while talking)
 
 function toggleMic(){
   if(micActive) stopMic(); else startMic();
@@ -2443,7 +2522,11 @@ async function runAiAnalysis(){
   const leadEl = document.getElementById('cs-lead-select');
   const lead = leadEl && leadEl.value ? leads.find(l=>l.id==leadEl.value) : null;
   const leadCtx = lead ? `Lead: ${lead.name}, city: ${lead.city||'unknown'}, notes: ${lead.notes||'none'}` : 'No specific lead selected.';
-  const fullTranscript = transcriptLines.map(l=>`[You]: ${l.text}`).join('\n');
+  const tailTranscript = transcriptLines.slice(-CALL_SCRIPT_TRANSCRIPT_MAX_LINES);
+  const fullTranscript = tailTranscript.map(l=>`[You]: ${l.text}`).join('\n');
+  const transcriptNote = transcriptLines.length > CALL_SCRIPT_TRANSCRIPT_MAX_LINES
+    ? `\n(Only the last ${CALL_SCRIPT_TRANSCRIPT_MAX_LINES} transcript segments are shown; earlier lines were truncated.)`
+    : '';
   const objHistCtx = objectionHistory.length ? 'Objections already handled this call: '+objectionHistory.map(o=>'"'+o+'"').join(', ') : 'No previous objections.';
 
   const prompt = `You are a real-time AI sales coach listening to a cold-call where someone is selling web design services to a med spa or local business. The salesperson is pitching a website redesign.
@@ -2451,7 +2534,7 @@ async function runAiAnalysis(){
 Context:
 - ${leadCtx}
 - ${objHistCtx}
-- Current call transcript (only salesperson's words are captured):
+- Current call transcript (only salesperson's words are captured):${transcriptNote}
 ${fullTranscript}
 
 Analyse the transcript and return ONLY valid JSON, no markdown, no explanation:
@@ -2471,7 +2554,7 @@ Rules:
 - If there's genuinely nothing to report for a field, use empty array [] or null`;
 
   try{
-    const d = await callGemini({model:'gemini-2.0-flash',contents:[{parts:[{text:prompt}]}]});
+    const d = await callGemini({model:GEMINI_MODEL,contents:[{parts:[{text:prompt}]}]});
     const raw = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const analysis = parseGeminiJsonObject(raw);
 

@@ -73,7 +73,7 @@ export default {
 
         const resp = await fetch(apiUrl);
         const data = await resp.json();
-        return json(data);
+        return json(data, resp.ok ? 200 : resp.status);
       }
 
       // ── /places ──────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ export default {
 
         const resp = await fetch(apiUrl);
         const data = await resp.json();
-        return json(data);
+        return json(data, resp.ok ? 200 : resp.status);
       }
 
       // ── /details ─────────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ export default {
 
         const resp = await fetch(apiUrl);
         const data = await resp.json();
-        return json(data);
+        return json(data, resp.ok ? 200 : resp.status);
       }
 
       // ── /gemini ──────────────────────────────────────────────────────────────
@@ -130,7 +130,8 @@ export default {
         });
 
         const data = await resp.json();
-        return json(data);
+        // Forward status so clients can detect 429 rate limits (not always only in JSON body)
+        return json(data, resp.ok ? 200 : resp.status);
       }
 
       // ── 404 ──────────────────────────────────────────────────────────────────
