@@ -261,6 +261,13 @@ td a:hover{text-decoration:underline;}
   .ai-window{width:calc(100vw - 40px);right:-8px;}
 }
 
+/* Hide scrollbars but keep content scrollable */
+* { scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { width: 0; height: 0; }
+
+/* Ensure AI messages wrap within the bubble */
+.ai-msg{white-space:normal;overflow-wrap:break-word;word-break:break-word;}
+
 /* ── SETTINGS PANEL ─────────────────────────────────────────────────────── */
 .settings-layout{display:grid;grid-template-columns:180px 1fr;gap:1.5rem;align-items:start;}
 .settings-nav{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;position:sticky;top:1rem;}
@@ -458,11 +465,11 @@ td a:hover{text-decoration:underline;}
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div id="topbar-key-status" class="key-indicator empty" onclick="switchTab('settings')" style="cursor:pointer;" title="Click to configure API keys">⚠ Keys not set</div>
       <div class="tab-row">
-        <button class="tab active" onclick="switchTab('scanner')">Scanner</button>
-        <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
-        <button class="tab" onclick="switchTab('demo')">Demo Builder</button>
-        <button class="tab" onclick="switchTab('settings')">⚙ Settings</button>
-      <button class="tab" onclick="switchTab('callscript')">📞 Call Script</button>
+          <button class="tab active" onclick="switchTab('scanner')">Scanner</button>
+          <button class="tab" onclick="switchTab('callscript')">📞 Call Script</button>
+          <button class="tab" onclick="switchTab('demo')">Demo Builder</button>
+          <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
+          <button class="tab" onclick="switchTab('settings')">⚙ Settings</button>
       </div>
     </div>
   </div>
@@ -1691,7 +1698,10 @@ function renderTracker(){
     <td class="col-web">${l.web?`<a href="https://${esc(l.web)}" target="_blank">${esc(l.web)}</a>`:''}</td>
     <td class="col-status"><select class="status-sel" onchange="updStatus(${l.id},this.value)">${['new','contacted','interested','closed','pass'].map(s=>`<option value="${s}" ${l.status===s?'selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></td>
     <td class="col-notes"><input class="notes-inp" value="${esc(l.notes||'')}" placeholder="Add note..." onchange="updNotes(${l.id},this.value)"/></td>
-    <td class="col-del" style="text-align:center;"><button class="del-btn" onclick="delLead(${l.id})">×</button></td>
+    <td class="col-del" style="text-align:center;">
+      <button class="btn btn-sm" onclick="fillDemoFromLead(${l.id})" title="Fill Demo from this lead">Demo</button>
+      <button class="del-btn" onclick="delLead(${l.id})">×</button>
+    </td>
   </tr>`).join('');
 }
 function updateTrackerCount(){const n=leads.length;document.getElementById('tracker-count').textContent=n?`(${n})`:'';renderStats();}
@@ -1826,6 +1836,22 @@ function fillDemoFromResult(i){
   if(rh) rh.value = (p.reviewSnippets && p.reviewSnippets.length) ? p.reviewSnippets.join('\n\n---\n\n') : '';
   renderServiceList();updatePreview();
   addAIMsg('assistant',`Filled demo form with details for "${p.name}". Switch to the Demo Builder tab to review and generate.`);
+}
+
+// Fill demo form from a tracker lead (by id)
+function fillDemoFromLead(id){
+  const l = leads.find(x=>x.id===id);
+  if(!l) return;
+  switchTab('demo');
+  document.getElementById('d-name').value = l.name || '';
+  document.getElementById('d-city').value = l.city || '';
+  document.getElementById('d-phone').value = l.phone || '';
+  // put website into address field if address missing
+  document.getElementById('d-address').value = l.address || l.web || '';
+  document.getElementById('d-google-rating').value = l.rating ? String(l.rating) : '';
+  document.getElementById('d-review-highlights').value = '';
+  renderServiceList(); updatePreview();
+  addAIMsg('assistant',`Filled demo form with details from tracker: "${l.name}".`);
 }
 
 // ── GENERATE DEMO ─────────────────────────────────────────────────────────────
