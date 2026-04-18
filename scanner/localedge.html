@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Med Spa Scanner</title>
+<title>LocalEdge</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -17,6 +17,10 @@
   --danger:#f86060;--danger-dim:rgba(248,96,96,0.1);
   --r:10px;--r-sm:6px;
 }
+
+/* ── INVISIBLE SCROLLBARS (functional, not visible) ─────────────────────── */
+*{scrollbar-width:none;-ms-overflow-style:none;}
+*::-webkit-scrollbar{display:none;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;}
@@ -228,8 +232,8 @@ td a:hover{text-decoration:underline;}
 .ai-bubble{position:fixed;bottom:28px;right:28px;z-index:1000;}
 .ai-toggle{width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(212,247,78,0.35);transition:all 0.2s;}
 .ai-toggle:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(212,247,78,0.5);}
-.ai-window{position:absolute;bottom:64px;right:0;width:360px;background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);overflow:hidden;display:none;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.5);max-height:520px;}
-.ai-window.open{display:flex;}
+.ai-window{position:absolute;bottom:64px;right:0;width:360px;background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);overflow:visible;display:none;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.5);max-height:520px;}
+.ai-window.open{display:flex;overflow:hidden;border-radius:var(--r);}
 .ai-header{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);}
 .ai-header-left{display:flex;align-items:center;gap:8px;}
 .ai-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite;}
@@ -239,7 +243,7 @@ td a:hover{text-decoration:underline;}
 .ai-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px;}
 .ai-close:hover{color:var(--text);}
 .ai-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:340px;}
-.ai-msg{max-width:88%;font-size:13px;line-height:1.6;padding:9px 13px;border-radius:var(--r-sm);}
+.ai-msg{max-width:88%;font-size:13px;line-height:1.6;padding:9px 13px;border-radius:var(--r-sm);word-wrap:break-word;overflow-wrap:break-word;word-break:break-word;}
 .ai-msg.user{background:var(--accent-dim);border:0.5px solid rgba(212,247,78,0.2);color:var(--text);align-self:flex-end;border-radius:var(--r-sm) var(--r-sm) 2px var(--r-sm);}
 .ai-msg.assistant{background:var(--surface2);color:var(--text);align-self:flex-start;border-radius:2px var(--r-sm) var(--r-sm) var(--r-sm);}
 .ai-msg.thinking{color:var(--muted);font-style:italic;}
@@ -445,12 +449,57 @@ td a:hover{text-decoration:underline;}
 .cs-outcome-flash{display:none;text-align:center;padding:8px;border-radius:var(--r-sm);font-size:13px;font-weight:500;margin-top:8px;}
 .cs-outcome-flash.show{display:block;}
 
+/* Capture mode buttons */
+.cs-capture-btn{background:var(--surface2);border:0.5px solid var(--border2);border-radius:20px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:5px 13px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.cs-capture-btn:hover{border-color:var(--border3);color:var(--text);}
+.cs-capture-btn.active{background:var(--accent-dim);border-color:rgba(212,247,78,0.5);color:var(--accent);}
+.cs-tx-them{background:var(--info-dim);color:var(--info);}
+.cs-tx-call{background:var(--warn-dim);color:var(--warn);}
+
 /* Tips */
 .cs-tip{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6;}
 .cs-tip:last-child{border-bottom:none;}
 .cs-tip-icon{flex-shrink:0;color:var(--accent);}
 
 @media(max-width:860px){.cs-layout{grid-template-columns:1fr;}}
+
+
+/* ── DEMO STYLE PICKER ───────────────────────────────────────────────────── */
+.style-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px;}
+.style-opt{border:0.5px solid var(--border2);border-radius:var(--r-sm);padding:10px 6px 8px;cursor:pointer;text-align:center;transition:all 0.15s;background:var(--surface2);}
+.style-opt:hover{border-color:var(--border3);}
+.style-opt.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+.style-swatch{width:100%;height:28px;border-radius:4px;margin-bottom:6px;}
+.style-name{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;}
+
+
+/* ── QUOTE TAB ─────────────────────────────────────────────────────────────── */
+.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.quote-section{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;}
+.quote-section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:500;margin-bottom:1rem;}
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+.tier-card{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);padding:1rem;cursor:pointer;transition:all 0.15s;text-align:center;position:relative;}
+.tier-card:hover{border-color:var(--border3);}
+.tier-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.tier-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;color:var(--accent);font-size:12px;font-weight:600;}
+.tier-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.tier-price{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:-0.5px;margin-bottom:6px;}
+.tier-price span{font-size:12px;font-weight:400;color:var(--muted);}
+.tier-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.addon-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);}
+.addon-row:last-child{border-bottom:none;}
+.addon-row input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.addon-label{flex:1;font-size:13px;color:var(--text);}
+.addon-price{font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;}
+.quote-total{background:var(--surface2);border-radius:var(--r-sm);padding:1rem 1.25rem;margin-top:1rem;display:flex;align-items:center;justify-content:space-between;}
+.quote-total-label{font-size:13px;color:var(--muted);}
+.quote-total-amount{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-1px;}
+.quote-actions{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap;}
+.stripe-status{font-size:12px;padding:8px 12px;border-radius:var(--r-sm);margin-top:8px;display:none;}
+.stripe-status.show{display:block;}
+.stripe-status.ok{background:var(--success-dim);color:var(--success);}
+.stripe-status.err{background:var(--danger-dim);color:var(--danger);}
+.stripe-status.working{background:var(--warn-dim);color:var(--warn);}
 
 </style>
 </head>
@@ -459,8 +508,8 @@ td a:hover{text-decoration:underline;}
 
   <div class="topbar">
     <div class="brand">
-      <h1>Med Spa <span>Scanner</span></h1>
-      <p>Find leads · Track outreach · Close clients</p>
+      <h1>Local<span>Edge</span></h1>
+      <p>Find leads · Close clients · Get paid</p>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div id="topbar-key-status" class="key-indicator empty" onclick="switchTab('settings')" style="cursor:pointer;" title="Click to configure API keys">⚠ Keys not set</div>
@@ -469,6 +518,7 @@ td a:hover{text-decoration:underline;}
           <button class="tab" onclick="switchTab('callscript')">📞 Call Script</button>
           <button class="tab" onclick="switchTab('demo')">Demo Builder</button>
           <button class="tab" onclick="switchTab('tracker')">Tracker <span id="tracker-count" style="font-size:11px;opacity:0.7;"></span></button>
+          <button class="tab" onclick="switchTab('quote')">💰 Quote</button>
           <button class="tab" onclick="switchTab('settings')">⚙ Settings</button>
       </div>
     </div>
@@ -640,12 +690,68 @@ td a:hover{text-decoration:underline;}
           <div class="demo-field"><label>Review highlights</label><textarea id="d-review-highlights" rows="4" placeholder="Short quotes from Google Places reviews — auto-filled when you use Demo from a scan result" oninput="updatePreview()"></textarea></div>
         </div>
         <div class="demo-section" style="margin-top:1rem;">
-          <div class="demo-section-title">Hero colour</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
-            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);"><input type="radio" name="hero-color" value="#f0e6d8" checked onchange="updatePreview()"/><span style="width:18px;height:18px;border-radius:50%;background:#f0e6d8;display:inline-block;border:1px solid rgba(255,255,255,0.2);"></span>Warm sand</label>
-            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);"><input type="radio" name="hero-color" value="#e8f0f5" onchange="updatePreview()"/><span style="width:18px;height:18px;border-radius:50%;background:#e8f0f5;display:inline-block;border:1px solid rgba(255,255,255,0.2);"></span>Cool blue</label>
-            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);"><input type="radio" name="hero-color" value="#f5f0e8" onchange="updatePreview()"/><span style="width:18px;height:18px;border-radius:50%;background:#f5f0e8;display:inline-block;border:1px solid rgba(255,255,255,0.2);"></span>Ivory</label>
-            <label style="cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);"><input type="radio" name="hero-color" value="#f0ece8" onchange="updatePreview()"/><span style="width:18px;height:18px;border-radius:50%;background:#f0ece8;display:inline-block;border:1px solid rgba(255,255,255,0.2);"></span>Stone</label>
+          <div class="demo-section-title">Website style &amp; vibe</div>
+          <div class="style-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="style-opt selected" onclick="setDemoStyle('warm')" id="style-warm">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#f0e6d8,#b8725f);"></div>
+              <div class="style-name">Warm</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('luxury')" id="style-luxury">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#1a1a2e,#c9a84c);"></div>
+              <div class="style-name">Luxury</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('minimal')" id="style-minimal">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#ffffff,#2d2d2d);border:0.5px solid rgba(255,255,255,0.1);"></div>
+              <div class="style-name">Minimal</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('bold')" id="style-bold">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#2d0a4e,#e040fb);"></div>
+              <div class="style-name">Bold</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('blush')" id="style-blush">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#fce4ec,#c48fa0);"></div>
+              <div class="style-name">Blush</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('nature')" id="style-nature">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#eaf3ea,#3d7a3d);"></div>
+              <div class="style-name">Nature</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('clinical')" id="style-clinical">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#edf3ff,#1a5fb0);"></div>
+              <div class="style-name">Clinical</div>
+            </div>
+            <div class="style-opt" onclick="setDemoStyle('modern')" id="style-modern">
+              <div class="style-swatch" style="background:linear-gradient(135deg,#f5f3ee,#8a6520);"></div>
+              <div class="style-name">Modern</div>
+            </div>
+          </div>
+          <!-- Custom accent color + layout controls -->
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="demo-field">
+              <label>Custom accent colour</label>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="color" id="d-custom-accent" value="#b8725f" oninput="applyCustomAccent(this.value)" style="width:36px;height:32px;padding:2px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);cursor:pointer;"/>
+                <span style="font-size:11px;color:var(--muted2);">Overrides style accent</span>
+                <button class="btn btn-ghost btn-sm" onclick="clearCustomAccent()" style="font-size:10px;padding:2px 7px;">Reset</button>
+              </div>
+            </div>
+            <div class="demo-field">
+              <label>Animation intensity</label>
+              <select id="d-anim-level" onchange="updatePreview()" style="background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 10px;outline:none;">
+                <option value="subtle">Subtle (smooth reveals)</option>
+                <option value="rich" selected>Rich (parallax + stagger)</option>
+                <option value="none">None (instant load)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;display:block;margin-bottom:6px;">Sections to include</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;"><input type="checkbox" id="sec-reviews" checked style="accent-color:var(--accent);"/> Reviews</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;"><input type="checkbox" id="sec-gallery" checked style="accent-color:var(--accent);"/> Before/After Gallery</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;"><input type="checkbox" id="sec-trust" checked style="accent-color:var(--accent);"/> Trust stats</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;"><input type="checkbox" id="sec-contact" checked style="accent-color:var(--accent);"/> Contact form</label>
+            </div>
           </div>
         </div>
       </div>
@@ -844,7 +950,7 @@ td a:hover{text-decoration:underline;}
         <!-- ABOUT -->
         <div class="settings-card" id="sc-about">
           <div class="settings-card-title">ℹ️ About</div>
-          <div class="settings-card-desc">Med Spa Scanner — a lead generation tool for web designers targeting aesthetic clinics.</div>
+          <div class="settings-card-desc">LocalEdge — a lead generation and client management tool for freelance web designers.</div>
           <div style="background:var(--surface2);border-radius:var(--r-sm);padding:1rem;font-size:13px;margin-bottom:1rem;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <div><span style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.07em;">Version</span><br/>2.0.0</div>
@@ -906,13 +1012,20 @@ td a:hover{text-decoration:underline;}
               <button class="btn btn-ghost btn-sm" onclick="clearTranscript()" style="font-size:11px;padding:3px 9px;">Clear</button>
             </div>
           </div>
+          <!-- Audio source selector -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <button class="cs-capture-btn active" id="capture-mic" onclick="setCaptureMode('mic')" title="Your microphone only">🎤 Mic (You)</button>
+            <button class="cs-capture-btn" id="capture-both" onclick="setCaptureMode('both')" title="Mic + system/call audio captured separately">🎤+🔊 Dual track</button>
+            <button class="cs-capture-btn" id="capture-sys" onclick="setCaptureMode('sys')" title="System audio only (e.g. browser call audio)">🔊 System audio</button>
+          </div>
           <div class="cs-mic-bar">
             <button class="cs-mic-btn idle" id="cs-mic-btn" onclick="toggleMic()">
               <span class="cs-mic-dot" id="cs-mic-dot"></span>
               <span id="cs-mic-btn-label">Start listening</span>
             </button>
-            <span style="font-size:11px;color:var(--muted2);max-width:340px;line-height:1.45;">Transcribes <strong>your</strong> mic (what you say in the room). It does not tap the phone line — the other person is only captured if their voice is picked up by your mic (e.g. speakerphone).</span>
+            <span id="cs-mic-hint" style="font-size:11px;color:var(--muted2);flex:1;line-height:1.45;">Mic captures your voice — labelled "You". Switch to Dual track to also capture the other person.</span>
           </div>
+          <div id="cs-ai-error" style="display:none;background:var(--danger-dim);border:0.5px solid var(--danger);border-radius:var(--r-sm);padding:7px 12px;font-size:12px;color:var(--danger);margin-top:6px;"></div>
           <div class="cs-transcript-scroll" id="cs-transcript">
             <div class="cs-tx-empty" id="cs-tx-empty">Press "Start listening" to begin transcribing the call in real-time.</div>
           </div>
@@ -955,6 +1068,49 @@ td a:hover{text-decoration:underline;}
           <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>The goal of this call is <strong>not to sell</strong> — it's to get permission to send the demo.</span></div>
           <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>If they say yes to seeing the demo, <strong>ask for their email on the call</strong> — don't wait.</span></div>
           <div class="cs-tip"><span class="cs-tip-icon">✦</span><span>Silence after the close is good. <strong>Don't fill it.</strong> Let them respond.</span></div>
+        </div>
+
+        <!-- Phone / Call integration guide -->
+        <div class="cs-card" id="phone-integration-card">
+          <div class="cs-card-title" style="cursor:pointer;" onclick="this.nextElementSibling.classList.toggle('hidden')">
+            <span>📱 Call Integration Options</span>
+            <span style="font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">tap to expand</span>
+          </div>
+          <div class="hidden">
+            <!-- Option 1 -->
+            <div style="background:var(--surface2);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px;border-left:2px solid var(--accent);">
+              <div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Option 1 — Best for computer calls (Zoom, Teams, Meet)</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.75;">
+                Use <strong style="color:var(--text);">Dual track mode</strong> above. Click the 🎤+🔊 button, then when Chrome asks what to share, pick the <strong style="color:var(--text);">browser tab</strong> your call is running in and tick <strong style="color:var(--text);">"Share tab audio"</strong>. The system audio (their voice) plays through speakers — your mic captures both you and them. AI labels segments as You/Them automatically.
+              </div>
+            </div>
+            <!-- Option 2 -->
+            <div style="background:var(--surface2);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px;border-left:2px solid var(--info);">
+              <div style="font-size:11px;font-weight:600;color:var(--info);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Option 2 — Virtual Audio Cable (any call, including phone)</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.75;">
+                Install <strong style="color:var(--text);">BlackHole</strong> (Mac — free) or <strong style="color:var(--text);">VB-Cable</strong> (Windows — free). Route your mic AND call audio through it and set it as your system default input. The app then picks up both sides in Mic mode with no screen share needed. Works with regular phone calls via a Bluetooth headset.
+                <div style="margin-top:6px;">
+                  <a href="https://github.com/ExistentialAudio/BlackHole" target="_blank" style="color:var(--info);font-size:11px;">→ BlackHole for Mac</a> &nbsp;·&nbsp;
+                  <a href="https://vb-audio.com/Cable/" target="_blank" style="color:var(--info);font-size:11px;">VB-Cable for Windows</a>
+                </div>
+              </div>
+            </div>
+            <!-- Option 3 -->
+            <div style="background:var(--surface2);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px;border-left:2px solid var(--warn);">
+              <div style="font-size:11px;font-weight:600;color:var(--warn);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Option 3 — Phone on speaker (easiest, no setup)</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.75;">
+                Put your phone on <strong style="color:var(--text);">speakerphone</strong>, use Mic mode. Your computer mic picks up both voices from the room. Works immediately — no installs. Keep background noise low. AI analyses the full conversation from context.
+              </div>
+            </div>
+            <!-- Option 4 -->
+            <div style="background:var(--surface2);border-radius:var(--r-sm);padding:12px 14px;border-left:2px solid var(--muted);">
+              <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Option 4 — Twilio / Google Voice (advanced, records both sides)</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.75;">
+                Use <strong style="color:var(--text);">Twilio's Programmable Voice</strong> or <strong style="color:var(--text);">Google Voice</strong> to record calls server-side. Your Cloudflare Worker can receive the recording webhook, send it to Google Speech-to-Text, and push the transcript here. This gives the cleanest dual-track audio but requires server setup.<br/>
+                <a href="https://www.twilio.com/docs/voice/api/recording" target="_blank" style="color:var(--muted);font-size:11px;margin-top:4px;display:inline-block;">→ Twilio Recording API docs</a>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1015,6 +1171,99 @@ td a:hover{text-decoration:underline;}
           <div class="cs-outcome-flash" id="cs-outcome-flash"></div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- QUOTE PANEL -->
+  <div class="panel" id="panel-quote">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:600;">Quote Builder</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Build a proposal, create a Stripe payment link, open the client view</div>
+      </div>
+    </div>
+
+    <div class="quote-grid">
+      <!-- LEFT: Business + Package -->
+      <div style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div class="quote-section">
+          <div class="quote-section-title">Business details</div>
+          <div class="demo-field"><label>Business name</label><input id="q-name" placeholder="e.g. Glow Med Spa" oninput="calcQuote()"/></div>
+          <div class="demo-field"><label>Business type</label><input id="q-type" placeholder="e.g. Med spa, Dentist, Gym…" oninput="calcQuote()"/></div>
+          <div class="demo-field"><label>City</label><input id="q-city" placeholder="e.g. Bethesda, MD" oninput="calcQuote()"/></div>
+          <div class="demo-field"><label>Contact name</label><input id="q-contact" placeholder="e.g. Sarah Kim" oninput="calcQuote()"/></div>
+        </div>
+
+        <div class="quote-section">
+          <div class="quote-section-title">Add-ons</div>
+          <div id="addon-list">
+            <div class="addon-row"><input type="checkbox" id="ao-seo" onchange="calcQuote()"/><span class="addon-label">SEO Setup & Google My Business</span><span class="addon-price">+$400</span></div>
+            <div class="addon-row"><input type="checkbox" id="ao-booking" onchange="calcQuote()"/><span class="addon-label">Online Booking Integration</span><span class="addon-price">+$350</span></div>
+            <div class="addon-row"><input type="checkbox" id="ao-analytics" onchange="calcQuote()"/><span class="addon-label">Analytics & Heatmap Setup</span><span class="addon-price">+$200</span></div>
+            <div class="addon-row"><input type="checkbox" id="ao-hosting" onchange="calcQuote()"/><span class="addon-label">1 Year Hosting & Maintenance</span><span class="addon-price">+$600</span></div>
+            <div class="addon-row"><input type="checkbox" id="ao-copy" onchange="calcQuote()"/><span class="addon-label">AI Copywriting (all pages)</span><span class="addon-price">+$300</span></div>
+            <div class="addon-row"><input type="checkbox" id="ao-logo" onchange="calcQuote()"/><span class="addon-label">Logo & Brand Kit</span><span class="addon-price">+$500</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Tiers + Total -->
+      <div style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div class="quote-section">
+          <div class="quote-section-title">Package tier</div>
+          <div class="tier-grid">
+            <div class="tier-card selected" id="tier-standard" onclick="selectTier('standard',2500)">
+              <div class="tier-name">Standard</div>
+              <div class="tier-price">$2,500<span>/one-off</span></div>
+              <div class="tier-desc">Responsive site · Booking form · Gallery · Contact · Mobile optimised</div>
+            </div>
+            <div class="tier-card" id="tier-premium" onclick="selectTier('premium',4500)">
+              <div class="tier-name">Premium</div>
+              <div class="tier-price">$4,500<span>/one-off</span></div>
+              <div class="tier-desc">Everything in Standard + Parallax animations · Real photo gallery · CMS · Review integration</div>
+            </div>
+            <div class="tier-card" id="tier-signature" onclick="selectTier('signature',7500)">
+              <div class="tier-name">Signature 3D</div>
+              <div class="tier-price">$7,500<span>+ / one-off</span></div>
+              <div class="tier-desc">Everything in Premium + Three.js hero · Particle effects · Custom 3D interactions · Bespoke design</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quote-section">
+          <div class="quote-section-title">Quote summary</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:10px;" id="quote-breakdown">Select a tier to see breakdown.</div>
+          <div class="quote-total">
+            <div class="quote-total-label">Total investment</div>
+            <div class="quote-total-amount" id="quote-total">$2,500</div>
+          </div>
+
+          <div class="quote-actions">
+            <button class="btn btn-accent" style="flex:1;" onclick="openClientView()">&#128279; Open Client View</button>
+            <button class="btn btn-success" style="flex:1;" onclick="createStripeLink('full')">&#9889; Create Payment Link</button>
+          </div>
+          <div id="stripe-result" class="stripe-status"></div>
+
+          <div style="margin-top:10px;text-align:center;">
+            <button class="btn btn-ghost btn-sm" onclick="createStripeLink('deposit')" style="font-size:11px;opacity:0.7;">
+              Split into payments (deposit link)
+            </button>
+            <select id="q-installments" style="background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--muted);font-size:11px;padding:4px 8px;outline:none;margin-left:6px;">
+              <option value="2">2 payments</option>
+              <option value="3">3 payments</option>
+              <option value="4">4 payments</option>
+            </select>
+          </div>
+
+          <div style="margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border);">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.07em;">Stripe setup</div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.6;">
+              Payment links are created via your Cloudflare Worker. Make sure <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">STRIPE_KEY</code> is set as a Worker secret:<br/>
+              <code style="background:var(--surface2);padding:2px 7px;border-radius:3px;font-size:11px;">wrangler secret put STRIPE_KEY</code>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1250,14 +1499,18 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(t){
-  const tabs=['scanner','tracker','demo','settings','callscript'];
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',tabs[i]===t));
+  document.querySelectorAll('.tab').forEach(el=>{
+    const oc=el.getAttribute('onclick')||'';
+    el.classList.toggle('active', oc.includes("'"+t+"'") || oc.includes('"'+t+'"'));
+  });
   document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
-  document.getElementById('panel-'+t).classList.add('active');
+  const panel=document.getElementById('panel-'+t);
+  if(panel) panel.classList.add('active');
   if(t==='tracker')renderTracker();
   if(t==='demo')renderServiceList();
   if(t==='settings'){loadSettingsUI();updateStorageUsed();}
   if(t==='callscript'){initCallScript();}
+  if(t==='quote'){initQuote();}
 }
 
 // ── ERROR ─────────────────────────────────────────────────────────────────────
@@ -1462,14 +1715,14 @@ async function runScan(){
   document.getElementById('scan-actions').style.display='none';
   document.getElementById('error-msg').classList.remove('show');
   document.getElementById('filter-bar').classList.remove('show');
-  document.getElementById('ai-filter-bar').classList.remove('show');
+  const aifb=document.getElementById('ai-filter-bar');if(aifb)aifb.classList.remove('show');
   document.getElementById('result-count').style.display='none';
   try{
     const loc=await geocode(city);
     const label=kw||'businesses';
     document.getElementById('loader-msg').textContent=`Scanning for ${label} near ${city}...`;
     const data=await placesSearch(loc.lat,loc.lng,radius,kw);
-    if(data.status==='REQUEST_DENIED')throw new Error('API key rejected. Check Places API and Geocoding API are enabled.');
+    if(data.status==='REQUEST_DENIED')throw new Error('API key rejected by Google. In Google Cloud Console, make sure the Geocoding API AND Places API are both enabled for your key. If using Worker, re-run: wrangler secret put PLACES_KEY');
     if(data.status==='ZERO_RESULTS'||!data.results?.length){document.getElementById('loader').classList.remove('active');document.getElementById('scan-empty').classList.add('show');return;}
     document.getElementById('loader-msg').textContent=`Loading details for ${data.results.length} businesses...`;
     const detailed=await mapWithConcurrency(data.results.slice(0,20),PLACES_DETAIL_CONCURRENCY,(p)=>enrichNearbyPlace(p,true));
@@ -1613,6 +1866,7 @@ async function runBulkScan(){
   document.getElementById('scan-empty').classList.remove('show');
   document.getElementById('scan-actions').style.display='none';
   document.getElementById('filter-bar').classList.remove('show');
+  const aifb2=document.getElementById('ai-filter-bar');if(aifb2)aifb2.classList.remove('show');
   document.getElementById('result-count').style.display='none';
   document.getElementById('error-msg').classList.remove('show');
   const kwDiv=document.getElementById('bulk-keywords');
@@ -1749,9 +2003,15 @@ function addService(){
 
 // ── DEMO PREVIEW ──────────────────────────────────────────────────────────────
 function getDemoValues(){
-  const heroColor=document.querySelector('input[name="hero-color"]:checked')?.value||'#f0e6d8';
   const reviewHighlights=document.getElementById('d-review-highlights')?.value.trim()||'';
   const googleRating=document.getElementById('d-google-rating')?.value.trim()||'';
+  const baseTheme = DEMO_STYLES[demoStyle] || DEMO_STYLES.warm;
+  const theme = customAccentOverride ? {
+    ...baseTheme,
+    accent: customAccentOverride,
+    accentDark: customAccentOverride,
+    // Darken for hover
+  } : baseTheme;
   return{
     name:document.getElementById('d-name').value.trim()||'[SPA NAME]',
     tagline:document.getElementById('d-tagline').value.trim()||'[TAGLINE]',
@@ -1761,7 +2021,13 @@ function getDemoValues(){
     address:document.getElementById('d-address').value.trim()||'[ADDRESS]',
     reviewHighlights,
     googleRating,
-    heroColor,
+    heroColor: theme.vars.match(/--hero-bg:([^;]+)/)?.[1]?.trim()||'#f0e6d8',
+    theme,
+    animLevel: document.getElementById('d-anim-level')?.value || 'rich',
+    secReviews: document.getElementById('sec-reviews')?.checked !== false,
+    secGallery: document.getElementById('sec-gallery')?.checked !== false,
+    secTrust: document.getElementById('sec-trust')?.checked !== false,
+    secContact: document.getElementById('sec-contact')?.checked !== false,
     services:customServices.filter(s=>s.enabled)
   };
 }
@@ -1777,8 +2043,8 @@ function updatePreview(){
     <div style="font-size:12px;color:var(--muted);">${esc(v.city)} · ${esc(v.phone)}</div></div>
     <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Services (${v.services.length})</div>
     <div>${v.services.map(s=>`<span class="preview-chip">${esc(s.name)} · $${esc(s.price)}</span>`).join('')}</div></div>
-    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Hero colour</div>
-    <div style="width:32px;height:32px;border-radius:8px;background:${v.heroColor};border:1px solid rgba(255,255,255,0.15);"></div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Style</div>
+    <div style="font-size:13px;color:var(--accent);font-weight:500;">${demoStyle.charAt(0).toUpperCase()+demoStyle.slice(1)}</div></div>
   </div>`;
 }
 
@@ -1825,6 +2091,9 @@ ${text}`;
 function fillDemoFromResult(i){
   const p=scanResults[i];if(!p)return;
   switchTab('demo');
+  // Auto-apply service preset based on current search type
+  const stype = document.getElementById('s-type')?.value?.trim();
+  if(stype) applyServicePreset(stype);
   document.getElementById('d-name').value=p.name||'';
   const city=(p.address||'').split(',').slice(1,2).join('').trim();
   document.getElementById('d-city').value=city||'';
@@ -1860,7 +2129,7 @@ function generateDemo(){
   if(v.name==='[SPA NAME]'){alert('Please enter a spa name first.');return;}
   const ratingStar=v.googleRating?esc(v.googleRating)+'★':'4.9★';
   const reviewBlocks=v.reviewHighlights?v.reviewHighlights.split(/\n+---\n+/).filter(Boolean).map(q=>`<blockquote class="review-card">&ldquo;${esc(q).replace(/\n/g,'<br>')}&rdquo;</blockquote>`).join(''):'';
-  const reviewsSection=reviewBlocks?`<section class="reviews-strip" id="reviews">
+  const reviewsSection=(reviewBlocks&&v.secReviews)?`<section class="reviews-strip" id="reviews">
   <div class="section-inner">
     <p class="section-label">Social proof</p>
     <h2 class="section-title">What clients say</h2>
@@ -1879,14 +2148,14 @@ function generateDemo(){
   const html=`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>${v.name}</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=${v.theme.fonts}&display=swap" rel="stylesheet"/>
 <style>
-:root{--cream:#fdf8f3;--warm:#f5ede0;--sand:#e8d5bc;--blush:#d4a89a;--rose:#b8725f;--brown:#6b4035;--text:#2c1a12;--muted:#8a6858;--hero-bg:${v.heroColor};--r:12px;}
+:root{${v.theme.vars}--rose:${v.theme.accent};--brown:${v.theme.accentDark};--r:12px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}html{scroll-behavior:smooth;}
-body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);font-size:16px;line-height:1.7;font-weight:300;}
-h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.2;}a{color:inherit;text-decoration:none;}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;background:rgba(253,248,243,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,168,154,0.2);}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;letter-spacing:0.05em;color:var(--brown);}
+body{font-family:${v.theme.bodyFont};background:var(--cream);color:var(--text);font-size:16px;line-height:1.7;font-weight:300;scroll-behavior:smooth;}
+h1,h2,h3{font-family:${v.theme.headFont};font-weight:400;line-height:1.2;}a{color:inherit;text-decoration:none;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;background:${v.theme.navBg};backdrop-filter:blur(8px);border-bottom:1px solid rgba(128,128,128,0.15);transition:background 0.3s;}
+.nav-logo{font-family:${v.theme.headFont};font-size:22px;font-weight:500;letter-spacing:0.05em;color:var(--brown);}
 .nav-links{display:flex;gap:2.5rem;list-style:none;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;}
 .nav-links a{color:var(--muted);transition:color 0.2s;}.nav-links a:hover{color:var(--rose);}
 .nav-book{background:var(--rose);color:white;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:10px 24px;border-radius:40px;border:none;cursor:pointer;transition:all 0.2s;}
@@ -1896,7 +2165,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .hero-inner{max-width:1100px;margin:0 auto;width:100%;position:relative;z-index:1;}
 .hero-eyebrow{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rose);font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:10px;}
 .hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--rose);}
-.hero h1{font-size:clamp(48px,6vw,80px);color:var(--brown);margin-bottom:1.5rem;font-style:italic;font-weight:300;max-width:700px;}
+.hero h1{font-size:clamp(48px,6vw,80px);color:var(--brown);margin-bottom:1.5rem;${v.theme.heroH1Style}max-width:700px;}
 .hero h1 span{font-style:normal;font-weight:500;}
 .hero-sub{font-size:17px;color:var(--muted);margin-bottom:2.5rem;max-width:480px;line-height:1.8;}
 .hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:3rem;}
@@ -1956,13 +2225,83 @@ footer{background:var(--brown);color:rgba(253,248,243,0.7);padding:3rem;text-ali
 .footer-links{display:flex;justify-content:center;gap:2rem;list-style:none;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2rem;}
 .footer-bottom{font-size:12px;opacity:0.5;}
 .success-msg{display:none;background:#edf7f0;border:1px solid #8fcca0;border-radius:8px;padding:14px 18px;font-size:14px;color:#2d6e45;margin-top:12px;text-align:center;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-.fade-up{animation:fadeUp 0.7s ease both;}.fade-up-2{animation:fadeUp 0.7s ease 0.15s both;}.fade-up-3{animation:fadeUp 0.7s ease 0.3s both;}.fade-up-4{animation:fadeUp 0.7s ease 0.45s both;}
 .reviews-strip{background:linear-gradient(180deg,rgba(245,237,224,0.5),transparent);border-bottom:1px solid rgba(212,168,154,0.15);}
 .review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;}
 .review-card{background:white;border-radius:var(--r);padding:1.5rem;border:1px solid rgba(212,168,154,0.2);font-size:14px;color:var(--muted);line-height:1.75;font-style:italic;}
+
+/* ── SMOOTH INFINITE-SCROLL SECTIONS ─────────────────────────────────────── */
+html{scroll-behavior:smooth;}
+section{scroll-margin-top:80px;position:relative;}
+
+/* Reveal animations (controlled by JS IntersectionObserver) */
+.reveal,[data-reveal]{opacity:0;transform:translateY(36px);transition:opacity 0.72s cubic-bezier(0.22,1,0.36,1),transform 0.72s cubic-bezier(0.22,1,0.36,1);}
+.reveal.visible,[data-reveal].visible{opacity:1;transform:none;}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity 0.72s cubic-bezier(0.22,1,0.36,1),transform 0.72s cubic-bezier(0.22,1,0.36,1);}
+.reveal-left.visible{opacity:1;transform:none;}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity 0.72s cubic-bezier(0.22,1,0.36,1),transform 0.72s cubic-bezier(0.22,1,0.36,1);}
+.reveal-right.visible{opacity:1;transform:none;}
+.reveal-scale{opacity:0;transform:scale(0.94);transition:opacity 0.6s cubic-bezier(0.22,1,0.36,1),transform 0.6s cubic-bezier(0.22,1,0.36,1);}
+.reveal-scale.visible{opacity:1;transform:none;}
+[data-delay="1"]{transition-delay:0.06s;}[data-delay="2"]{transition-delay:0.13s;}
+[data-delay="3"]{transition-delay:0.20s;}[data-delay="4"]{transition-delay:0.28s;}
+[data-delay="5"]{transition-delay:0.36s;}[data-delay="6"]{transition-delay:0.44s;}
+
+/* Section separator lines */
+section::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--sep-rgb,180,110,90),0.3),transparent);}
+.hero::before{display:none;}
+
+/* Scroll-progress indicator */
+#scroll-bar{position:fixed;top:0;left:0;height:2px;background:var(--rose);z-index:9999;width:0%;transition:width 0.1s linear;pointer-events:none;}
+
+/* Nav scroll-shrink */
+nav{transition:padding 0.3s,background 0.3s;}
+nav.shrunk{padding:0.75rem 3rem;}
+
+/* Parallax layers */
+.parallax-layer{will-change:transform;}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at var(--mx,60%) var(--my,40%),rgba(180,110,90,0.14) 0%,transparent 60%);pointer-events:none;}
+
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}section{padding:4rem 1.5rem;}.hero{padding:6rem 1.5rem 3rem;}.contact-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}}
+
+/* ── DEMO STYLE PICKER ───────────────────────────────────────────────────── */
+.style-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px;}
+.style-opt{border:0.5px solid var(--border2);border-radius:var(--r-sm);padding:10px 6px 8px;cursor:pointer;text-align:center;transition:all 0.15s;background:var(--surface2);}
+.style-opt:hover{border-color:var(--border3);}
+.style-opt.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+.style-swatch{width:100%;height:28px;border-radius:4px;margin-bottom:6px;}
+.style-name{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;}
+
+
+/* ── QUOTE TAB ─────────────────────────────────────────────────────────────── */
+.quote-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.quote-section{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;}
+.quote-section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:500;margin-bottom:1rem;}
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+.tier-card{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);padding:1rem;cursor:pointer;transition:all 0.15s;text-align:center;position:relative;}
+.tier-card:hover{border-color:var(--border3);}
+.tier-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.tier-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;color:var(--accent);font-size:12px;font-weight:600;}
+.tier-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.tier-price{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:-0.5px;margin-bottom:6px;}
+.tier-price span{font-size:12px;font-weight:400;color:var(--muted);}
+.tier-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.addon-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);}
+.addon-row:last-child{border-bottom:none;}
+.addon-row input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.addon-label{flex:1;font-size:13px;color:var(--text);}
+.addon-price{font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;}
+.quote-total{background:var(--surface2);border-radius:var(--r-sm);padding:1rem 1.25rem;margin-top:1rem;display:flex;align-items:center;justify-content:space-between;}
+.quote-total-label{font-size:13px;color:var(--muted);}
+.quote-total-amount{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-1px;}
+.quote-actions{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap;}
+.stripe-status{font-size:12px;padding:8px 12px;border-radius:var(--r-sm);margin-top:8px;display:none;}
+.stripe-status.show{display:block;}
+.stripe-status.ok{background:var(--success-dim);color:var(--success);}
+.stripe-status.err{background:var(--danger-dim);color:var(--danger);}
+.stripe-status.working{background:var(--warn-dim);color:var(--warn);}
+
 </style></head><body>
+<div id="scroll-bar"></div>
 <nav>
   <div class="nav-logo">${v.name}</div>
   <ul class="nav-links"><li><a href="#services">Services</a></li>${reviewBlocks?'<li><a href="#reviews">Reviews</a></li>':''}<li><a href="#gallery">Results</a></li><li><a href="#contact">Contact</a></li></ul>
@@ -1970,25 +2309,25 @@ footer{background:var(--brown);color:rgba(253,248,243,0.7);padding:3rem;text-ali
 </nav>
 <section class="hero">
   <div class="hero-inner">
-    <p class="hero-eyebrow fade-up">${v.city}'s Premier Med Spa</p>
-    <h1 class="fade-up-2">Your skin <span>deserves</span> the best.</h1>
-    <p class="hero-sub fade-up-3">Expert aesthetic treatments tailored to you. Natural results, lasting confidence — right here in ${v.city}.</p>
-    <div class="hero-actions fade-up-4">
+    <p class="hero-eyebrow reveal">${v.city}'s Premier Med Spa</p>
+    <h1 class="reveal stagger-1">Your skin <span>deserves</span> the best.</h1>
+    <p class="hero-sub reveal stagger-2">Expert aesthetic treatments tailored to you. Natural results, lasting confidence — right here in ${v.city}.</p>
+    <div class="hero-actions reveal stagger-3">
       <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Book a Free Consultation</button>
       <button class="btn-outline" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">View Services</button>
     </div>
-    <div class="hero-trust fade-up-4">
+    ${v.secTrust?`<div class="hero-trust reveal stagger-4">
       <div class="trust-item"><div class="trust-num">500+</div><div class="trust-label">Happy clients</div></div>
       <div class="trust-item"><div class="trust-num">${ratingStar}</div><div class="trust-label">Google rating</div></div>
       <div class="trust-item"><div class="trust-num">5yr</div><div class="trust-label">Experience</div></div>
-    </div>
+    </div>`:''}
   </div>
 </section>
 ${reviewsSection}
 <section class="services-bg" id="services">
   <div class="section-inner">
     <p class="section-label">What we offer</p>
-    <h2 class="section-title">Our treatments</h2>
+    <h2 class="section-title reveal">Our treatments</h2>
     <p class="section-sub">Each treatment is performed by licensed professionals using the latest techniques.</p>
     <div class="services-grid">${serviceCards}</div>
   </div>
@@ -1996,7 +2335,7 @@ ${reviewsSection}
 <section id="gallery">
   <div class="section-inner">
     <p class="section-label">Real results</p>
-    <h2 class="section-title">Before &amp; after</h2>
+    <h2 class="section-title reveal">Before &amp; after</h2>
     <p class="section-sub">Every result is from a real client treated right here at ${v.name}.</p>
     <div class="gallery-grid">
       <div class="ba-card"><div class="ba-images"><div class="ba-side before"><span class="ba-label">Before</span>Photo</div><div class="ba-side after"><span class="ba-label">After</span>Photo</div><div class="ba-divider"></div></div><div class="ba-info"><div><div class="ba-treatment">Lip Fillers</div><div class="ba-sessions">1 syringe &bull; Same day</div></div><span class="ba-tag">Popular</span></div></div>
@@ -2010,7 +2349,7 @@ ${reviewsSection}
     <div class="contact-grid">
       <div>
         <p class="section-label">Get in touch</p>
-        <h2 class="section-title">Book your consultation</h2>
+        <h2 class="section-title reveal">Book your consultation</h2>
         <p class="section-sub">Your first consultation is completely free.</p>
         <div class="contact-info-item"><div class="contact-icon">&#128205;</div><div><div class="contact-detail-label">Address</div><div class="contact-detail-value">${v.address}</div></div></div>
         <div class="contact-info-item"><div class="contact-icon">&#128222;</div><div><div class="contact-detail-label">Phone</div><div class="contact-detail-value">${v.phone}</div></div></div>
@@ -2038,8 +2377,51 @@ ${reviewsSection}
   <div class="footer-bottom">&copy; 2026 ${v.name} &middot; ${v.city} &middot; All rights reserved</div>
 </footer>
 <script>
-const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='translateY(0)'}}),{threshold:0.1});
-document.querySelectorAll('.service-card,.ba-card,.contact-info-item').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='opacity 0.5s ease,transform 0.5s ease';obs.observe(el);});
+// ── Scroll progress bar ──────────────────────────────────────────────────────
+const sb=document.getElementById('scroll-bar');
+function updateSB(){if(sb){const p=window.scrollY/(document.body.scrollHeight-window.innerHeight);sb.style.width=(Math.min(1,isNaN(p)?0:p)*100)+'%';}}
+window.addEventListener('scroll',updateSB,{passive:true});
+
+// ── IntersectionObserver — smooth reveal on scroll ───────────────────────────
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.10,rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale').forEach(el=>obs.observe(el));
+document.querySelectorAll('.service-card').forEach((el,i)=>{el.setAttribute('data-delay',String((i%6)+1));el.classList.add('reveal');obs.observe(el);});
+document.querySelectorAll('.ba-card').forEach((el,i)=>{el.setAttribute('data-delay',String((i%3)+1));el.classList.add('reveal-scale');obs.observe(el);});
+document.querySelectorAll('.contact-info-item').forEach((el,i)=>{el.setAttribute('data-delay',String(i+1));el.classList.add('reveal-left');obs.observe(el);});
+document.querySelectorAll('.review-card').forEach((el,i)=>{el.setAttribute('data-delay',String((i%4)+1));el.classList.add('reveal');obs.observe(el);});
+document.querySelectorAll('section .section-label,section .section-title,section .section-sub').forEach((el,i)=>{el.classList.add('reveal');el.setAttribute('data-delay',String(i%3+1));obs.observe(el);});
+
+// ── Nav shrink on scroll ─────────────────────────────────────────────────────
+const navEl=document.querySelector('nav');
+window.addEventListener('scroll',()=>{
+  if(!navEl)return;
+  const s=window.scrollY>60;
+  navEl.style.padding=s?'0.7rem 3rem':'1.25rem 3rem';
+  navEl.style.backdropFilter='blur('+(s?'18':'8')+'px)';
+},{passive:true});
+
+// ── Hero parallax ────────────────────────────────────────────────────────────
+const heroEl=document.querySelector('.hero');
+if(heroEl){
+  document.addEventListener('mousemove',e=>{
+    heroEl.style.setProperty('--mx',(e.clientX/window.innerWidth*100).toFixed(1)+'%');
+    heroEl.style.setProperty('--my',(e.clientY/window.innerHeight*100).toFixed(1)+'%');
+  },{passive:true});
+  window.addEventListener('scroll',()=>{
+    const y=window.scrollY;
+    if(y<window.innerHeight) heroEl.style.transform='translateY('+(y*0.18)+'px)';
+  },{passive:true});
+}
+
+// ── Smooth anchor scrolling ──────────────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
 <\/script></body></html>`;
 
   const filename=v.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+$/,'')+'.html';
@@ -2210,6 +2592,7 @@ function loadSettingsUI(){
   const wu = getWorkerUrl();
   const wInput = document.getElementById('s-worker-url');
   if(wInput){ wInput.value=''; wInput.placeholder = wu ? wu : 'https://medspa-scanner-api.yourname.workers.dev'; }
+  checkKey(); // refresh status badge whenever settings panel loads
 
   // Scan defaults
   try{
@@ -2328,6 +2711,7 @@ function exportSettingsJSON(){
   const data={settings:getSettings(),exported:new Date().toISOString()};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='medspa_settings.json';a.click();
 }
+function handleImportJSON(input){ return importSettingsJSON(input); }
 function importSettingsJSON(input){
   const file=input.files[0];if(!file)return;
   const r=new FileReader();
@@ -2431,7 +2815,8 @@ let interimEl = null;
 let aiAnalysisTimer = null;
 let objectionHistory = [];
 let lastAnalysedLength = 0;
-const AI_DEBOUNCE_MS = 8000;    // analyse 8s after last speech segment (fewer Gemini calls while talking)
+const AI_DEBOUNCE_MS = 16000;  // wait 16s after last speech (prevents 429 bursts)
+const AI_MIN_NEW_WORDS = 8;    // skip re-analysis if too little new content
 
 function toggleMic(){
   if(micActive) stopMic(); else startMic();
@@ -2485,15 +2870,23 @@ function startMic(){
     scrollTranscript();
   };
 
-  recognition.onerror = (e)=>{ if(e.error!=='aborted') stopMic(); };
+  recognition.onerror = (e)=>{ if(e.error!=='aborted'&&e.error!=='no-speech') stopMic(); };
   recognition.onend = ()=>{ if(micActive) recognition.start(); }; // keep going
 
   recognition.start();
+
+  // Dual-track: also start system audio capture + second recognition
+  if(captureMode === 'both'){
+    startSystemAudio().then(ok=>{ if(ok && micActive) startThemRecognition(); });
+  } else if(captureMode === 'sys'){
+    startSystemAudio().then(ok=>{ if(ok && micActive) startThemRecognition(); });
+  }
 }
 
 function stopMic(){
   micActive = false;
   if(recognition){ try{recognition.stop();}catch(e){} recognition=null; }
+  stopSystemAudio();
   document.getElementById('cs-mic-btn').className = 'cs-mic-btn idle';
   document.getElementById('cs-mic-btn-label').textContent = 'Start listening';
   document.getElementById('cs-mic-dot').classList.remove('listening');
@@ -2505,11 +2898,17 @@ function stopMic(){
 
 function addTranscriptLine(speaker, text){
   transcriptLines.push({speaker, text, ts: Date.now()});
+  if(speaker==='you') lastMicSpeechAt = Date.now();
   const wrap = document.getElementById('cs-transcript');
   const div = document.createElement('div');
   div.className = 'cs-tx-line';
-  div.innerHTML = `<span class="cs-tx-speaker cs-tx-you">You</span><span>${esc(text)}</span>`;
-  // Insert before interim if it exists
+  const speakerMap = {
+    you: {label:'You', cls:'cs-tx-you'},
+    them: {label:'Them', cls:'cs-tx-them'},
+    call: {label:'Call', cls:'cs-tx-call'},
+  };
+  const sp = speakerMap[speaker] || speakerMap.you;
+  div.innerHTML = `<span class="cs-tx-speaker ${sp.cls}">${sp.label}</span><span>${esc(text)}</span>`;
   if(interimEl) wrap.insertBefore(div, interimEl);
   else wrap.appendChild(div);
   scrollTranscript();
@@ -2524,16 +2923,24 @@ function clearTranscript(){
   transcriptLines = [];
   objectionHistory = [];
   lastAnalysedLength = 0;
+  lastAnalysedWordCount = 0;
   document.getElementById('cs-transcript').innerHTML = '<div class="cs-tx-empty" id="cs-tx-empty">Press "Start listening" to begin transcribing.</div>';
   interimEl = null;
   resetObjectionUI();
   document.getElementById('cs-intel-content').innerHTML = '<div class="cs-intel-empty">Start listening — AI will extract key intel from the conversation as you speak.</div>';
 }
 
+function countWords(lines){ return lines.reduce((n,l)=>n+(l.text||'').split(/\s+/).filter(Boolean).length,0); }
+let lastAnalysedWordCount = 0;
 function scheduleAiAnalysis(){
   if(!hasGeminiAccess()) return;
   clearTimeout(aiAnalysisTimer);
-  aiAnalysisTimer = setTimeout(()=>runAiAnalysis(), AI_DEBOUNCE_MS);
+  aiAnalysisTimer = setTimeout(()=>{
+    const wc = countWords(transcriptLines);
+    if(wc - lastAnalysedWordCount < AI_MIN_NEW_WORDS) return; // not enough new content
+    lastAnalysedWordCount = wc;
+    runAiAnalysis();
+  }, AI_DEBOUNCE_MS);
 }
 
 async function runAiAnalysis(){
@@ -2549,18 +2956,20 @@ async function runAiAnalysis(){
   const lead = leadEl && leadEl.value ? leads.find(l=>l.id==leadEl.value) : null;
   const leadCtx = lead ? `Lead: ${lead.name}, city: ${lead.city||'unknown'}, notes: ${lead.notes||'none'}` : 'No specific lead selected.';
   const tailTranscript = transcriptLines.slice(-CALL_SCRIPT_TRANSCRIPT_MAX_LINES);
-  const fullTranscript = tailTranscript.map(l=>`[You]: ${l.text}`).join('\n');
+  const fullTranscript = tailTranscript.map(l=>`[${l.speaker==='them'?'PROSPECT':l.speaker==='call'?'CALL':'YOU'}]: ${l.text}`).join('\n');
   const transcriptNote = transcriptLines.length > CALL_SCRIPT_TRANSCRIPT_MAX_LINES
-    ? `\n(Only the last ${CALL_SCRIPT_TRANSCRIPT_MAX_LINES} transcript segments are shown; earlier lines were truncated.)`
+    ? `\n(Only the last ${CALL_SCRIPT_TRANSCRIPT_MAX_LINES} transcript segments shown; earlier truncated.)`
     : '';
   const objHistCtx = objectionHistory.length ? 'Objections already handled this call: '+objectionHistory.map(o=>'"'+o+'"').join(', ') : 'No previous objections.';
 
+  const captureNote = captureMode==='both' ? "Both YOU and THEM labels are in the transcript. THEM = prospect's words." : captureMode==='sys' ? "Only system audio captured — all speech is the prospect (THEM)." : "Only salesperson captured (YOU). Infer prospect objections from context.";
   const prompt = `You are a real-time AI sales coach listening to a cold-call where someone is selling web design services to a med spa or local business. The salesperson is pitching a website redesign.
 
 Context:
 - ${leadCtx}
 - ${objHistCtx}
-- Current call transcript (only salesperson's words are captured):${transcriptNote}
+- Capture mode: ${captureNote}
+- Current call transcript:${transcriptNote}
 ${fullTranscript}
 
 Analyse the transcript and return ONLY valid JSON, no markdown, no explanation:
@@ -2599,7 +3008,22 @@ Rules:
 
   }catch(e){
     document.getElementById('cs-obj-thinking').classList.remove('show');
+    // Show rate-limit errors to user instead of silently swallowing them
+    if(e && (e.geminiRateLimited || (e.message && e.message.includes('429')))){
+      showAiCallError('Rate limit hit (429) — AI will retry automatically. Keep talking, analysis resumes shortly.');
+    } else if(e && e.message){
+      showAiCallError('AI error: '+e.message.slice(0,120));
+    }
   }
+}
+
+function showAiCallError(msg){
+  const el = document.getElementById('cs-ai-error');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.style.display='none'; }, 8000);
 }
 
 function showObjection(objText, response){
@@ -2794,6 +3218,403 @@ function logOutcome(status, noteText){
   setTimeout(()=>flash.classList.remove('show'),3000);
   renderTracker();
   populateLeadSelector();
+}
+
+
+// ── DEMO STYLE THEMES ─────────────────────────────────────────────────────────
+let demoStyle = 'warm';
+const DEMO_STYLES = {
+  warm: {
+    fonts: "'Cormorant Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400','Jost:wght@300;400;500'",
+    headFont: "'Cormorant Garamond', serif",
+    bodyFont: "'Jost', sans-serif",
+    vars: '--cream:#fdf8f3;--warm:#f5ede0;--sand:#e8d5bc;--blush:#d4a89a;--accent-c:#b8725f;--deep:#6b4035;--text:#2c1a12;--muted:#8a6858;--hero-bg:#f0e6d8;',
+    heroH1Style: 'font-style:italic;font-weight:300;',
+    accent: '#b8725f', accentDark:'#6b4035',
+    navBg:'rgba(253,248,243,0.92)',
+    sectionBg:'#f5ede0',
+  },
+  luxury: {
+    fonts: "'Playfair+Display:ital,wght@0,400;0,700;1,400','Inter:wght@300;400;500'",
+    headFont: "'Playfair Display', serif",
+    bodyFont: "'Inter', sans-serif",
+    vars: '--cream:#0d0d14;--warm:#14141f;--sand:#1e1e2e;--blush:#c9a84c;--accent-c:#c9a84c;--deep:#c9a84c;--text:#ede8d8;--muted:#9a9280;--hero-bg:#0d0d14;',
+    heroH1Style: 'font-style:normal;font-weight:700;letter-spacing:-1px;',
+    accent: '#c9a84c', accentDark:'#a08030',
+    navBg:'rgba(13,13,20,0.96)',
+    sectionBg:'#14141f',
+  },
+  minimal: {
+    fonts: "'DM+Sans:wght@300;400;500','DM+Serif+Display:ital@0;1'",
+    headFont: "'DM Serif Display', serif",
+    bodyFont: "'DM Sans', sans-serif",
+    vars: '--cream:#ffffff;--warm:#f5f5f5;--sand:#e8e8e8;--blush:#333333;--accent-c:#111111;--deep:#111111;--text:#111111;--muted:#777777;--hero-bg:#f8f8f8;',
+    heroH1Style: 'font-style:normal;font-weight:400;letter-spacing:-2px;',
+    accent: '#111111', accentDark:'#000000',
+    navBg:'rgba(255,255,255,0.96)',
+    sectionBg:'#f5f5f5',
+  },
+  bold: {
+    fonts: "'Syne:wght@400;600;700;800','Space+Grotesk:wght@300;400;500'",
+    headFont: "'Syne', sans-serif",
+    bodyFont: "'Space Grotesk', sans-serif",
+    vars: '--cream:#0e0024;--warm:#1a0038;--sand:#2d0050;--blush:#e040fb;--accent-c:#e040fb;--deep:#ff80ff;--text:#f0e0ff;--muted:#b090cc;--hero-bg:#130030;',
+    heroH1Style: 'font-style:normal;font-weight:800;letter-spacing:-1px;',
+    accent: '#e040fb', accentDark:'#9c00c0',
+    navBg:'rgba(14,0,36,0.95)',
+    sectionBg:'#1a0038',
+  },
+  blush: {
+    fonts: "'Libre+Baskerville:ital,wght@0,400;0,700;1,400','Nunito:wght@300;400;500'",
+    headFont: "'Libre Baskerville', serif",
+    bodyFont: "'Nunito', sans-serif",
+    vars: '--cream:#fff5f8;--warm:#fce4ec;--sand:#f8bbd0;--blush:#c48fa0;--accent-c:#ad6b80;--deep:#7a3b50;--text:#3d1a26;--muted:#8c6070;--hero-bg:#fff0f4;',
+    heroH1Style: 'font-style:italic;font-weight:400;',
+    accent: '#ad6b80', accentDark:'#7a3b50',
+    navBg:'rgba(255,245,248,0.92)',
+    sectionBg:'#fce4ec',
+  },
+  nature: {
+    fonts: "'Lora:ital,wght@0,400;0,600;1,400','Mulish:wght@300;400;500'",
+    headFont: "'Lora', serif",
+    bodyFont: "'Mulish', sans-serif",
+    vars: '--cream:#f4f8f4;--warm:#e8f2e8;--sand:#c8e0c0;--blush:#6aab6a;--accent-c:#3d7a3d;--deep:#1e4a1e;--text:#1a2e1a;--muted:#5a7a5a;--hero-bg:#eaf3ea;',
+    heroH1Style: 'font-style:normal;font-weight:600;',
+    accent: '#3d7a3d', accentDark:'#1e4a1e',
+    navBg:'rgba(244,248,244,0.93)',
+    sectionBg:'#e8f2e8',
+  },
+  clinical: {
+    fonts: "'Inter:wght@300;400;500;600','Instrument+Serif:ital@0;1'",
+    headFont: "'Instrument Serif', serif",
+    bodyFont: "'Inter', sans-serif",
+    vars: '--cream:#f8fbff;--warm:#edf3ff;--sand:#d0e0f8;--blush:#4a90d9;--accent-c:#1a5fb0;--deep:#0d3060;--text:#0a1a30;--muted:#4a6080;--hero-bg:#f0f6ff;',
+    heroH1Style: 'font-style:normal;font-weight:400;letter-spacing:-1px;',
+    accent: '#1a5fb0', accentDark:'#0d3060',
+    navBg:'rgba(248,251,255,0.95)',
+    sectionBg:'#edf3ff',
+  },
+  modern: {
+    fonts: "'Plus+Jakarta+Sans:wght@300;400;500;600;700','Fraunces:ital,wght@0,300;1,300'",
+    headFont: "'Fraunces', serif",
+    bodyFont: "'Plus Jakarta Sans', sans-serif",
+    vars: '--cream:#fafaf8;--warm:#f2f0eb;--sand:#e0dcd0;--blush:#c0a060;--accent-c:#8a6520;--deep:#3a2a08;--text:#1a1408;--muted:#6a5840;--hero-bg:#f5f3ee;',
+    heroH1Style: 'font-style:italic;font-weight:300;letter-spacing:-0.5px;',
+    accent: '#8a6520', accentDark:'#3a2a08',
+    navBg:'rgba(250,250,248,0.94)',
+    sectionBg:'#f2f0eb',
+  }
+};
+
+let customAccentOverride = null;
+function setDemoStyle(style){
+  demoStyle = style;
+  document.querySelectorAll('.style-opt').forEach(el=>el.classList.remove('selected'));
+  const el = document.getElementById('style-'+style);
+  if(el) el.classList.add('selected');
+  // Sync color picker to theme accent
+  const theme = DEMO_STYLES[style];
+  if(theme && !customAccentOverride){
+    const cp = document.getElementById('d-custom-accent');
+    if(cp) cp.value = theme.accent;
+  }
+  updatePreview();
+}
+function applyCustomAccent(color){
+  customAccentOverride = color;
+  updatePreview();
+}
+function clearCustomAccent(){
+  customAccentOverride = null;
+  const theme = DEMO_STYLES[demoStyle];
+  const cp = document.getElementById('d-custom-accent');
+  if(cp && theme) cp.value = theme.accent;
+  updatePreview();
+}
+
+// ── DUAL-TRACK AUDIO CAPTURE ─────────────────────────────────────────────────
+// captureMode: 'mic' | 'both' | 'sys'
+let captureMode = 'mic';
+let speakerphoneMode = false; // legacy compat
+let sysRecognition = null;    // second SpeechRecognition for system audio playback
+let sysAudioStream = null;    // MediaStream from getDisplayMedia
+let sysAudioEl = null;        // <audio> element that plays system audio through speakers
+
+function setCaptureMode(mode){
+  if(micActive) stopMic(); // stop everything before switching
+  captureMode = mode;
+  speakerphoneMode = (mode !== 'mic');
+  document.querySelectorAll('.cs-capture-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('capture-'+mode);
+  if(btn) btn.classList.add('active');
+  const hints = {
+    mic: '🎤 Mic captures YOUR voice only — labelled "You". AI infers what the prospect says from context.',
+    both: '🎤+🔊 Dual track — mic labels "You", system audio plays through speakers so mic also catches "Them". Share a browser tab with audio when prompted.',
+    sys: '🔊 System audio from your computer — labels "Them". Use when you want to capture only the other side (e.g. a recording or playback).',
+  };
+  const h = document.getElementById('cs-mic-hint');
+  if(h) h.textContent = hints[mode] || hints.mic;
+}
+
+async function startSystemAudio(){
+  try{
+    // Ask user to share a tab/window WITH audio
+    sysAudioStream = await navigator.mediaDevices.getDisplayMedia({video:false, audio:true});
+  }catch(e){
+    showAiCallError('System audio access denied or unsupported. Try "Mic" mode or put phone on speaker.');
+    return false;
+  }
+  // Play system audio through speakers → mic picks it up as "Them" 
+  sysAudioEl = document.createElement('audio');
+  sysAudioEl.srcObject = sysAudioStream;
+  sysAudioEl.autoplay = true;
+  sysAudioEl.muted = false;
+  document.body.appendChild(sysAudioEl);
+
+  // Also run a second SpeechRecognition on default mic (which now hears system audio through speakers)
+  // We differentiate: system audio segments come through while you aren't speaking
+  // For a cleaner label, we add a small flag
+  sysAudioStream.getAudioTracks()[0].onended = ()=>{ stopSystemAudio(); };
+  return true;
+}
+
+function stopSystemAudio(){
+  if(sysAudioStream){ sysAudioStream.getTracks().forEach(t=>t.stop()); sysAudioStream=null; }
+  if(sysAudioEl){ sysAudioEl.pause(); sysAudioEl.remove(); sysAudioEl=null; }
+  if(sysRecognition){ try{sysRecognition.stop();}catch(e){} sysRecognition=null; }
+}
+
+// Start a second SpeechRecognition to label "Them" segments
+// (runs simultaneously with main mic recognition — brief silence gaps separate speakers)
+let lastMicSpeechAt = 0;
+function startThemRecognition(){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec) return;
+  sysRecognition = new SpeechRec();
+  sysRecognition.continuous = true;
+  sysRecognition.interimResults = false;
+  sysRecognition.lang = 'en-US';
+  sysRecognition.onresult = (e)=>{
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal){
+        const t = e.results[i][0].transcript.trim();
+        if(!t) continue;
+        // Attribute to "Them" if we haven't seen mic activity in the last 1.5s
+        const speaker = (Date.now() - lastMicSpeechAt > 1500) ? 'them' : 'you';
+        addTranscriptLine(speaker, t);
+        scheduleAiAnalysis();
+      }
+    }
+  };
+  sysRecognition.onerror = ()=>{};
+  sysRecognition.onend = ()=>{ if(micActive && captureMode==='both') sysRecognition.start(); };
+  sysRecognition.start();
+}
+
+
+// ── SERVICE PRESETS BY BUSINESS TYPE ─────────────────────────────────────────
+const SERVICE_PRESETS = {
+  'med spa':          [{name:'Botox & Dysport',price:'300',unit:'area',icon:'✦',desc:'Smooth fine lines with precision neurotoxin injections.'},{name:'Lip Fillers',price:'650',unit:'syringe',icon:'◈',desc:'Enhance volume and definition with hyaluronic acid fillers.'},{name:'Laser Hair Removal',price:'150',unit:'session',icon:'◇',desc:'Permanent hair reduction with state-of-the-art laser technology.'},{name:'Skin Rejuvenation',price:'250',unit:'session',icon:'❋',desc:'Restore a radiant, youthful complexion with signature treatments.'},{name:'Chemical Peels',price:'180',unit:'treatment',icon:'◉',desc:'Resurface and refresh skin with customised medical-grade peels.'}],
+  'botox':            [{name:'Botox & Dysport',price:'300',unit:'area',icon:'✦',desc:'Smooth fine lines with precision neurotoxin injections.'},{name:'Lip Fillers',price:'650',unit:'syringe',icon:'◈',desc:'Enhance volume and definition.'},{name:'Cheek Filler',price:'750',unit:'syringe',icon:'◇',desc:'Restore youthful volume to the cheeks.'},{name:'Jawline Filler',price:'800',unit:'syringe',icon:'❋',desc:'Define and contour the jawline.'}],
+  'aesthetic clinic': [{name:'Botox',price:'300',unit:'area',icon:'✦',desc:'Precision neurotoxin treatment.'},{name:'Dermal Fillers',price:'650',unit:'syringe',icon:'◈',desc:'Restore volume and definition.'},{name:'Microneedling',price:'350',unit:'session',icon:'◇',desc:'Stimulate collagen and transform skin texture.'},{name:'PRP Treatment',price:'500',unit:'session',icon:'❋',desc:'Platelet-rich plasma for skin and hair rejuvenation.'},{name:'Skin Boosters',price:'400',unit:'session',icon:'◉',desc:'Deep skin hydration with hyaluronic acid.'}],
+  'laser hair removal':[{name:'Full Legs',price:'350',unit:'session',icon:'✦',desc:'Complete leg laser hair removal.'},{name:'Underarms',price:'80',unit:'session',icon:'◈',desc:'Fast and effective underarm treatment.'},{name:'Brazilian',price:'150',unit:'session',icon:'◇',desc:'Full bikini laser treatment.'},{name:'Full Face',price:'120',unit:'session',icon:'❋',desc:'Facial hair removal.'},{name:'Full Body Package',price:'900',unit:'package',icon:'◉',desc:'Complete body laser hair removal.'}],
+  'dentist':          [{name:'Teeth Whitening',price:'299',unit:'session',icon:'✦',desc:'Professional in-chair whitening for a brighter smile.'},{name:'Invisalign',price:'3500',unit:'treatment',icon:'◈',desc:'Clear aligner orthodontic treatment.'},{name:'Dental Veneers',price:'1200',unit:'per tooth',icon:'◇',desc:'Porcelain veneers for a perfect smile.'},{name:'General Checkup',price:'120',unit:'visit',icon:'❋',desc:'Comprehensive dental examination and clean.'},{name:'Implants',price:'4500',unit:'implant',icon:'◉',desc:'Permanent tooth replacement solution.'}],
+  'gym':              [{name:'Personal Training',price:'80',unit:'session',icon:'✦',desc:'One-on-one tailored training sessions.'},{name:'Group Classes',price:'20',unit:'class',icon:'◈',desc:'High-energy group fitness classes.'},{name:'Monthly Membership',price:'60',unit:'month',icon:'◇',desc:'Full gym access with unlimited classes.'},{name:'Nutrition Coaching',price:'150',unit:'month',icon:'❋',desc:'Personalised meal planning and guidance.'},{name:'Online Coaching',price:'100',unit:'month',icon:'◉',desc:'Remote coaching and programme design.'}],
+  'yoga studio':      [{name:'Drop-in Class',price:'22',unit:'class',icon:'✦',desc:'Single yoga class, all levels welcome.'},{name:'Monthly Unlimited',price:'120',unit:'month',icon:'◈',desc:'Unlimited classes for the whole month.'},{name:'Beginner Course',price:'180',unit:'course',icon:'◇',desc:'6-week beginners programme.'},{name:'Private Session',price:'90',unit:'session',icon:'❋',desc:'One-on-one personalised yoga session.'},{name:'Retreats',price:'450',unit:'retreat',icon:'◉',desc:'Weekend yoga and wellness retreat.'}],
+  'hair salon':       [{name:'Cut & Blow Dry',price:'85',unit:'visit',icon:'✦',desc:'Expert cut and professional blow dry.'},{name:'Full Colour',price:'180',unit:'visit',icon:'◈',desc:'All-over colour with premium products.'},{name:'Balayage / Highlights',price:'250',unit:'visit',icon:'◇',desc:'Hand-painted highlights for natural dimension.'},{name:'Brazilian Blowout',price:'300',unit:'treatment',icon:'❋',desc:'Smooth and frizz-free hair treatment.'},{name:'Hair Extensions',price:'600',unit:'set',icon:'◉',desc:'Natural hair extension fitting and styling.'}],
+  'nail salon':       [{name:'Manicure',price:'45',unit:'visit',icon:'✦',desc:'Classic manicure with nail shaping and polish.'},{name:'Pedicure',price:'60',unit:'visit',icon:'◈',desc:'Relaxing pedicure with scrub and polish.'},{name:'Gel Nails',price:'70',unit:'visit',icon:'◇',desc:'Long-lasting gel nail application.'},{name:'Nail Extensions',price:'120',unit:'set',icon:'❋',desc:'Acrylic or gel nail extensions.'},{name:'Nail Art',price:'90',unit:'visit',icon:'◉',desc:'Custom nail art and designs.'}],
+  'restaurant':       [{name:'Lunch Set Menu',price:'25',unit:'person',icon:'✦',desc:'Two-course lunch with a drink.'},{name:'Dinner Tasting Menu',price:'85',unit:'person',icon:'◈',desc:'Five-course chef\'s tasting experience.'},{name:'Private Dining',price:'500',unit:'event',icon:'◇',desc:'Exclusive private dining room hire.'},{name:'Catering',price:'40',unit:'person',icon:'❋',desc:'Off-site catering for events.'},{name:'Cooking Classes',price:'120',unit:'person',icon:'◉',desc:'Hands-on cooking class with the chef.'}],
+  'plumber':          [{name:'Emergency Call-out',price:'150',unit:'visit',icon:'✦',desc:'24/7 emergency plumbing response.'},{name:'Boiler Service',price:'120',unit:'service',icon:'◈',desc:'Annual boiler inspection and service.'},{name:'Bathroom Install',price:'2500',unit:'project',icon:'◇',desc:'Full bathroom suite installation.'},{name:'Drain Cleaning',price:'80',unit:'service',icon:'❋',desc:'Professional drain unblocking.'},{name:'Leak Repair',price:'95',unit:'visit',icon:'◉',desc:'Fast leak detection and repair.'}],
+  'electrician':      [{name:'Safety Inspection',price:'150',unit:'visit',icon:'✦',desc:'Full electrical safety certificate.'},{name:'Consumer Unit',price:'800',unit:'installation',icon:'◈',desc:'Full consumer unit replacement.'},{name:'EV Charger Install',price:'750',unit:'installation',icon:'◇',desc:'Home EV charger installation.'},{name:'Smart Lighting',price:'400',unit:'room',icon:'❋',desc:'Smart home lighting installation.'},{name:'Emergency Callout',price:'120',unit:'visit',icon:'◉',desc:'24-hour emergency electrical service.'}],
+  'hvac':             [{name:'AC Installation',price:'3000',unit:'unit',icon:'✦',desc:'Full air conditioning installation.'},{name:'Heating Service',price:'120',unit:'service',icon:'◈',desc:'Annual heating system service.'},{name:'Duct Cleaning',price:'400',unit:'service',icon:'◇',desc:'Professional duct deep cleaning.'},{name:'Emergency Repair',price:'200',unit:'callout',icon:'❋',desc:'Emergency heating/cooling repair.'},{name:'Smart Thermostat',price:'350',unit:'installation',icon:'◉',desc:'Smart thermostat supply and fit.'}],
+  'real estate':      [{name:'Property Listing',price:'1500',unit:'listing',icon:'✦',desc:'Professional listing with photography.'},{name:'Buyer\'s Agent',price:'0',unit:'(% commission)',icon:'◈',desc:'Expert buyer representation.'},{name:'Property Management',price:'150',unit:'month',icon:'◇',desc:'Full property management service.'},{name:'Valuation',price:'300',unit:'report',icon:'❋',desc:'Comprehensive property valuation.'},{name:'Conveyancing',price:'1200',unit:'sale',icon:'◉',desc:'End-to-end conveyancing service.'}],
+  'default':          [{name:'Core Service',price:'0',unit:'session',icon:'✦',desc:'Describe your primary service.'},{name:'Premium Package',price:'0',unit:'package',icon:'◈',desc:'Your premium service offering.'},{name:'Consultation',price:'0',unit:'hour',icon:'◇',desc:'Initial consultation and assessment.'}]
+};
+
+function detectServicePreset(businessType) {
+  if (!businessType) return null;
+  const q = businessType.toLowerCase();
+  for (const [key, services] of Object.entries(SERVICE_PRESETS)) {
+    if (q.includes(key) || key.includes(q)) return services;
+  }
+  // partial match
+  const words = q.split(/\s+/);
+  for (const word of words) {
+    for (const [key, services] of Object.entries(SERVICE_PRESETS)) {
+      if (key.includes(word) && word.length > 3) return services;
+    }
+  }
+  return null;
+}
+
+function applyServicePreset(businessType) {
+  const preset = detectServicePreset(businessType);
+  if (!preset) return false;
+  customServices = preset.map((s, i) => ({
+    id: svcNextId++, enabled: i < 4, // first 4 enabled by default
+    name: s.name, price: s.price, unit: s.unit, icon: s.icon, desc: s.desc
+  }));
+  save();
+  renderServiceList();
+  return true;
+}
+
+
+// ── QUOTE BUILDER ─────────────────────────────────────────────────────────────
+let quoteTierName = 'standard';
+let quoteTierBase = 2500;
+
+const ADDON_PRICES = { 'ao-seo':400,'ao-booking':350,'ao-analytics':200,'ao-hosting':600,'ao-copy':300,'ao-logo':500 };
+
+const TIER_FEATURES = {
+  standard: ['Fully responsive website','Up to 6 pages','Booking / contact form','Before & after gallery','Mobile optimised','Smooth scroll animations','Google Maps embed','1 revision round'],
+  premium:  ['Everything in Standard','Parallax & scroll animations','Real photo gallery with lightbox','Content management system','Google Reviews integration','2 revision rounds','Priority delivery (5 days)'],
+  signature:['Everything in Premium','Three.js 3D hero section','Custom particle effects','Micro-interaction animations','Bespoke design — no templates','Unlimited revisions','White-glove handover call'],
+};
+
+function selectTier(name, base) {
+  quoteTierName = name;
+  quoteTierBase = base;
+  document.querySelectorAll('.tier-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('tier-'+name).classList.add('selected');
+  calcQuote();
+}
+
+function calcQuote() {
+  const addonTotal = Object.entries(ADDON_PRICES).reduce((sum,[id,price]) => {
+    const el = document.getElementById(id);
+    return sum + (el && el.checked ? price : 0);
+  }, 0);
+  const total = quoteTierBase + addonTotal;
+  document.getElementById('quote-total').textContent = '$' + total.toLocaleString();
+
+  const features = TIER_FEATURES[quoteTierName] || [];
+  const addons = Object.entries(ADDON_PRICES)
+    .filter(([id]) => { const el = document.getElementById(id); return el && el.checked; })
+    .map(([id, price]) => {
+      const label = document.querySelector(`#${id} + .addon-label`);
+      return label ? '+ ' + label.textContent + ' ($' + price + ')' : '';
+    }).filter(Boolean);
+
+  const breakdown = [
+    `<div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:500;">${quoteTierName.charAt(0).toUpperCase()+quoteTierName.slice(1)} package — $${quoteTierBase.toLocaleString()}</div>`,
+    ...features.map(f => `<div style="font-size:11px;color:var(--muted);padding:2px 0;">✓ ${f}</div>`),
+    addons.length ? `<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);">${addons.map(a=>`<div style="font-size:11px;color:var(--accent);padding:2px 0;">${a}</div>`).join('')}</div>` : '',
+  ].join('');
+  document.getElementById('quote-breakdown').innerHTML = breakdown;
+}
+
+function getQuoteTotal() {
+  const addonTotal = Object.entries(ADDON_PRICES).reduce((sum,[id,price]) => {
+    const el = document.getElementById(id);
+    return sum + (el && el.checked ? price : 0);
+  }, 0);
+  return quoteTierBase + addonTotal;
+}
+
+function getQuoteConfig() {
+  return {
+    business: {
+      name: document.getElementById('q-name').value.trim() || 'Your Business',
+      type: document.getElementById('q-type').value.trim() || '',
+      city: document.getElementById('q-city').value.trim() || '',
+      contact: document.getElementById('q-contact').value.trim() || '',
+    },
+    tier: quoteTierName,
+    tierBase: quoteTierBase,
+    addons: Object.entries(ADDON_PRICES)
+      .filter(([id]) => { const el = document.getElementById(id); return el && el.checked; })
+      .map(([id, price]) => {
+        const label = document.querySelector(`#${id} + .addon-label`);
+        return { id, price, label: label ? label.textContent : id };
+      }),
+    total: getQuoteTotal(),
+    workerUrl: getWorkerUrl(),
+    features: TIER_FEATURES[quoteTierName] || [],
+    // Demo config from demo builder
+    demo: {
+      name: document.getElementById('d-name')?.value || document.getElementById('q-name')?.value || '',
+      city: document.getElementById('d-city')?.value || document.getElementById('q-city')?.value || '',
+      phone: document.getElementById('d-phone')?.value || '',
+      address: document.getElementById('d-address')?.value || '',
+      tagline: document.getElementById('d-tagline')?.value || '',
+      email: document.getElementById('d-email')?.value || '',
+      googleRating: document.getElementById('d-google-rating')?.value || '4.9',
+      reviewHighlights: document.getElementById('d-review-highlights')?.value || '',
+      style: typeof demoStyle !== 'undefined' ? demoStyle : 'warm',
+      services: (typeof customServices !== 'undefined' ? customServices : []).filter(s=>s.enabled),
+    }
+  };
+}
+
+function openClientView() {
+  const config = getQuoteConfig();
+  const hash = btoa(encodeURIComponent(JSON.stringify(config)));
+  const url = 'client.html#' + hash;
+  window.open(url, '_blank');
+}
+
+async function createStripeLink(mode) {
+  const wurl = getWorkerUrl();
+  const statusEl = document.getElementById('stripe-result');
+
+  if (!wurl) {
+    statusEl.className = 'stripe-status err show';
+    statusEl.textContent = '✗ No Cloudflare Worker URL set. Go to Settings → Cloudflare to add it.';
+    return;
+  }
+
+  const name = document.getElementById('q-name').value.trim() || 'Website Project';
+  const total = getQuoteTotal();
+  const installments = parseInt(document.getElementById('q-installments').value) || 2;
+  const tier = quoteTierName.charAt(0).toUpperCase() + quoteTierName.slice(1);
+
+  statusEl.className = 'stripe-status working show';
+  statusEl.textContent = mode === 'deposit'
+    ? `Creating deposit link (1 of ${installments} payments)…`
+    : 'Creating payment link…';
+
+  try {
+    const res = await fetch(wurl + '/stripe/create-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: total * 100, // Stripe uses cents
+        name: `${name} — ${tier} Website`,
+        description: `LocalEdge ${tier} package for ${name}`,
+        mode,
+        installments,
+        currency: 'usd',
+      })
+    });
+    const d = await res.json();
+
+    if (d.error || !d.url) {
+      statusEl.className = 'stripe-status err show';
+      statusEl.textContent = '✗ ' + (d.error || 'Unknown error from Stripe');
+      return;
+    }
+
+    statusEl.className = 'stripe-status ok show';
+    const displayAmt = mode === 'deposit'
+      ? `$${(d.amount / 100).toLocaleString()} deposit (1 of ${installments})`
+      : `$${(d.amount / 100).toLocaleString()} full payment`;
+
+    statusEl.innerHTML = `✓ Payment link created! <a href="${d.url}" target="_blank" style="color:var(--success);text-decoration:underline;">Open Stripe checkout →</a><br><span style="font-size:11px;opacity:0.7;">${displayAmt} · Copy link: ${d.url}</span>`;
+
+  } catch (e) {
+    statusEl.className = 'stripe-status err show';
+    statusEl.textContent = '✗ Request failed: ' + e.message;
+  }
+}
+
+function initQuote() {
+  // Pre-fill from demo builder if available
+  const dName = document.getElementById('d-name')?.value;
+  const dCity = document.getElementById('d-city')?.value;
+  if (dName && !document.getElementById('q-name').value) document.getElementById('q-name').value = dName;
+  if (dCity && !document.getElementById('q-city').value) document.getElementById('q-city').value = dCity;
+  calcQuote();
 }
 
 load();renderTracker();updateTrackerCount();renderServiceList();checkKey();applyScanDefaultsToUI();

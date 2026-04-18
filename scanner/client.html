@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Your New Website — Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --cream:#fdf8f3;--warm:#f5ede0;--sand:#e8d5bc;--blush:#d4a89a;
+  --rose:#b8725f;--brown:#6b4035;--text:#2c1a12;--muted:#8a6858;
+  --hero-bg:#f0e6d8;--r:12px;
+  --c-accent:#b8725f;--c-dark:#6b4035;--c-nav:rgba(253,248,243,0.92);
+  --head-font:'Cormorant Garamond',serif;--body-font:'Jost',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+*{scrollbar-width:none;-ms-overflow-style:none;}
+*::-webkit-scrollbar{display:none;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body-font);background:var(--cream);color:var(--text);font-size:16px;line-height:1.7;font-weight:300;overflow-x:hidden;}
+h1,h2,h3{font-family:var(--head-font);font-weight:400;line-height:1.2;}
+a{color:inherit;text-decoration:none;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;background:var(--c-nav);backdrop-filter:blur(8px);border-bottom:1px solid rgba(128,128,128,0.15);transition:padding 0.3s;}
+.nav-logo{font-family:var(--head-font);font-size:22px;font-weight:500;letter-spacing:0.05em;color:var(--brown);}
+.nav-book{background:var(--rose);color:white;font-family:var(--body-font);font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:10px 24px;border-radius:40px;border:none;cursor:pointer;transition:all 0.2s;}
+.nav-book:hover{background:var(--brown);}
+.nav-links{display:flex;gap:2.5rem;list-style:none;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;}
+.nav-links a{color:var(--muted);transition:color 0.2s;}
+.nav-links a:hover{color:var(--rose);}
+
+/* SECTIONS */
+section{scroll-margin-top:80px;}
+.section-inner{max-width:1100px;margin:0 auto;padding:0 3rem;}
+.section-label{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rose);font-weight:500;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px;}
+.section-label::before{content:'';width:24px;height:1px;background:var(--rose);}
+.section-title{font-size:clamp(36px,4vw,52px);color:var(--brown);margin-bottom:1rem;}
+.section-sub{font-size:17px;color:var(--muted);max-width:520px;margin-bottom:3rem;line-height:1.8;}
+
+/* HERO */
+.hero{min-height:100vh;background:var(--hero-bg);display:flex;align-items:center;padding:8rem 3rem 4rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,154,0.25) 0%,transparent 70%);pointer-events:none;}
+#hero-3d-canvas{position:absolute;inset:0;pointer-events:none;opacity:0.4;}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;position:relative;z-index:1;}
+.hero-eyebrow{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--rose);font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:10px;}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--rose);}
+.hero h1{font-size:clamp(48px,6vw,80px);color:var(--brown);margin-bottom:1.5rem;font-style:italic;font-weight:300;max-width:700px;}
+.hero h1 span{font-style:normal;font-weight:500;}
+.hero-sub{font-size:17px;color:var(--muted);margin-bottom:2.5rem;max-width:480px;line-height:1.8;}
+.hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:3rem;}
+.btn-primary{background:var(--rose);color:white;padding:16px 36px;border-radius:40px;font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.2s;display:inline-block;}
+.btn-primary:hover{background:var(--brown);transform:translateY(-2px);}
+.btn-outline{border:1px solid var(--blush);color:var(--brown);padding:15px 32px;border-radius:40px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;background:transparent;display:inline-block;}
+.btn-outline:hover{background:var(--warm);border-color:var(--rose);}
+.hero-trust{display:flex;gap:2rem;padding-top:2rem;border-top:1px solid rgba(212,168,154,0.3);flex-wrap:wrap;}
+.trust-num{font-family:var(--head-font);font-size:36px;font-weight:500;color:var(--rose);line-height:1;}
+.trust-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;}
+
+/* SERVICES */
+.services-bg{background:var(--warm);}
+.services-section{padding:6rem 0;}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+.service-card{background:white;border-radius:var(--r);padding:2rem;border:1px solid rgba(212,168,154,0.2);transition:transform 0.2s,box-shadow 0.2s;position:relative;overflow:hidden;}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blush),var(--rose));transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+.service-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(107,64,53,0.1);}
+.service-card:hover::before{transform:scaleX(1);}
+.service-icon{width:48px;height:48px;background:var(--warm);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;font-size:22px;}
+.service-name{font-family:var(--head-font);font-size:22px;color:var(--brown);margin-bottom:0.5rem;}
+.service-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:1.25rem;}
+.service-price{font-family:var(--head-font);font-size:28px;color:var(--rose);font-weight:500;}
+.service-price span{font-family:var(--body-font);font-size:13px;color:var(--muted);font-weight:300;}
+
+/* GALLERY */
+.gallery-section{padding:6rem 0;}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;}
+.ba-card{border-radius:var(--r);overflow:hidden;border:1px solid rgba(212,168,154,0.2);background:white;}
+.ba-images{display:grid;grid-template-columns:1fr 1fr;height:220px;position:relative;}
+.ba-side{display:flex;align-items:center;justify-content:center;font-family:var(--head-font);font-size:15px;font-style:italic;color:white;position:relative;}
+.ba-side.before{background:linear-gradient(135deg,#c9b0a0,#a07060);}
+.ba-side.after{background:linear-gradient(135deg,var(--blush),var(--rose));}
+.ba-label{position:absolute;top:10px;font-family:var(--body-font);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;background:rgba(255,255,255,0.25);padding:3px 10px;border-radius:20px;color:white;}
+.ba-divider{position:absolute;left:50%;top:0;bottom:0;width:2px;background:white;transform:translateX(-50%);z-index:2;}
+.ba-info{padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.ba-treatment{font-family:var(--head-font);font-size:18px;color:var(--brown);}
+.ba-sessions{font-size:12px;color:var(--muted);margin-top:2px;}
+.ba-tag{background:var(--warm);color:var(--rose);font-size:11px;padding:4px 12px;border-radius:20px;font-weight:500;}
+
+/* REVIEWS */
+.reviews-strip{background:linear-gradient(180deg,rgba(245,237,224,0.5),transparent);border-bottom:1px solid rgba(212,168,154,0.15);}
+.reviews-section{padding:6rem 0;}
+.review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;}
+.review-card{background:white;border-radius:var(--r);padding:1.5rem;border:1px solid rgba(212,168,154,0.2);font-size:14px;color:var(--muted);line-height:1.75;font-style:italic;}
+
+/* CONTACT */
+.contact-bg{background:var(--warm);}
+.contact-section{padding:6rem 0;}
+.contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:4rem;align-items:start;}
+.contact-info-item{display:flex;gap:1rem;margin-bottom:1.75rem;align-items:flex-start;}
+.contact-icon{width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid rgba(212,168,154,0.3);}
+.contact-detail-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:500;margin-bottom:3px;}
+.contact-detail-value{font-size:16px;color:var(--brown);}
+.contact-form{background:white;border-radius:var(--r);padding:2.5rem;border:1px solid rgba(212,168,154,0.2);}
+.form-title{font-family:var(--head-font);font-size:28px;color:var(--brown);margin-bottom:0.5rem;}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:1.75rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.form-field label{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:500;}
+.form-field input,.form-field select,.form-field textarea{background:var(--cream);border:1px solid rgba(212,168,154,0.3);border-radius:8px;padding:12px 14px;font-family:var(--body-font);font-size:14px;color:var(--text);outline:none;transition:border-color 0.2s;width:100%;}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--rose);}
+.form-field textarea{resize:vertical;min-height:100px;}
+.form-submit{width:100%;background:var(--rose);color:white;border:none;border-radius:40px;padding:16px;font-family:var(--body-font);font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+.form-submit:hover{background:var(--brown);}
+.success-msg{display:none;background:#edf7f0;border:1px solid #8fcca0;border-radius:8px;padding:14px 18px;font-size:14px;color:#2d6e45;margin-top:12px;text-align:center;}
+
+/* FOOTER */
+footer{background:var(--brown);color:rgba(253,248,243,0.7);padding:3rem;text-align:center;}
+.footer-logo{font-family:var(--head-font);font-size:28px;color:var(--cream);margin-bottom:0.75rem;}
+.footer-tagline{font-size:13px;font-style:italic;margin-bottom:1.5rem;font-family:var(--head-font);color:var(--sand);}
+.footer-links{display:flex;justify-content:center;gap:2rem;list-style:none;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2rem;}
+.footer-bottom{font-size:12px;opacity:0.5;}
+
+/* PROPOSAL PANEL */
+.proposal-btn{position:fixed;bottom:28px;right:28px;z-index:300;background:var(--brown);color:white;border:none;border-radius:40px;padding:14px 24px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(107,64,53,0.4);transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.proposal-btn:hover{background:#4a2820;transform:translateY(-2px);}
+.proposal-btn .pb-dot{width:8px;height:8px;border-radius:50%;background:var(--blush);animation:pbpulse 2s ease infinite;}
+@keyframes pbpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.proposal-panel{position:fixed;bottom:0;left:0;right:0;z-index:400;background:white;border-top:1px solid rgba(107,64,53,0.15);box-shadow:0 -8px 40px rgba(107,64,53,0.15);transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);max-height:85vh;overflow-y:auto;border-radius:20px 20px 0 0;}
+.proposal-panel.open{transform:translateY(0);}
+.proposal-header{padding:1.5rem 2rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(212,168,154,0.2);position:sticky;top:0;background:white;z-index:1;}
+.proposal-title{font-family:var(--head-font);font-size:24px;color:var(--brown);}
+.proposal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:4px;}
+.proposal-body{padding:1.5rem 2rem 2rem;}
+
+/* Tier cards in proposal */
+.p-tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
+.p-tier{border:1.5px solid rgba(212,168,154,0.3);border-radius:var(--r);padding:1.25rem;cursor:pointer;transition:all 0.15s;position:relative;text-align:center;}
+.p-tier:hover{border-color:var(--rose);}
+.p-tier.selected{border-color:var(--rose);background:linear-gradient(135deg,rgba(184,114,95,0.06),rgba(212,168,154,0.08));}
+.p-tier.selected::after{content:'Selected';position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--rose);color:white;font-size:10px;font-weight:600;padding:2px 10px;border-radius:0 0 8px 8px;letter-spacing:0.08em;text-transform:uppercase;}
+.p-tier-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--brown);margin-bottom:4px;}
+.p-tier-price{font-size:26px;font-weight:700;color:var(--rose);letter-spacing:-0.5px;margin-bottom:8px;}
+.p-tier-price span{font-size:13px;font-weight:400;color:var(--muted);}
+.p-tier-feats{list-style:none;font-size:12px;color:var(--muted);text-align:left;line-height:2;}
+.p-tier-feats li::before{content:'✓ ';color:var(--rose);}
+
+/* Payment section */
+.payment-section{background:var(--cream);border-radius:var(--r);padding:1.5rem;border:1px solid rgba(212,168,154,0.2);}
+.payment-amount{font-family:var(--head-font);font-size:42px;color:var(--brown);font-weight:400;margin-bottom:4px;}
+.payment-label{font-size:13px;color:var(--muted);margin-bottom:1.25rem;}
+.pay-full-btn{width:100%;background:var(--rose);color:white;border:none;border-radius:40px;padding:18px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:10px;letter-spacing:0.02em;}
+.pay-full-btn:hover{background:var(--brown);transform:translateY(-1px);}
+.pay-full-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.split-link{text-align:center;font-size:12px;color:var(--muted);margin-top:4px;}
+.split-link button{background:none;border:none;color:var(--muted);cursor:pointer;text-decoration:underline;font-size:12px;font-family:var(--body-font);}
+.split-link button:hover{color:var(--rose);}
+.split-options{display:none;margin-top:12px;padding:12px;background:white;border-radius:10px;border:1px solid rgba(212,168,154,0.2);}
+.split-options.show{display:block;}
+.split-opt-btn{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:1px solid rgba(212,168,154,0.3);border-radius:8px;padding:10px 14px;margin-bottom:8px;cursor:pointer;font-family:var(--body-font);font-size:13px;color:var(--text);transition:all 0.15s;}
+.split-opt-btn:last-child{margin-bottom:0;}
+.split-opt-btn:hover{border-color:var(--rose);background:rgba(184,114,95,0.04);}
+.split-opt-btn span{color:var(--rose);font-weight:500;}
+.pay-status{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none;}
+.pay-status.show{display:block;}
+.pay-status.ok{background:#edf7f0;color:#2d6e45;}
+.pay-status.err{background:#fef0f0;color:#a32d2d;}
+.pay-status.working{background:#fffbec;color:#7a5c00;}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.6s cubic-bezier(0.22,1,0.36,1),transform 0.6s cubic-bezier(0.22,1,0.36,1);}
+.reveal.visible{opacity:1;transform:none;}
+.stagger-1{transition-delay:0.05s;}.stagger-2{transition-delay:0.12s;}.stagger-3{transition-delay:0.19s;}.stagger-4{transition-delay:0.26s;}.stagger-5{transition-delay:0.33s;}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem;}.nav-links{display:none;}
+  .hero{padding:6rem 1.5rem 3rem;}
+  .section-inner{padding:0 1.5rem;}
+  .services-section,.gallery-section,.reviews-section,.contact-section{padding:4rem 0;}
+  .contact-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .p-tier-grid{grid-template-columns:1fr;}
+  .proposal-body{padding:1rem 1.25rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <div class="nav-logo" id="nav-logo">Business Name</div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Results</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-book" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Book Now</button>
+</nav>
+
+<canvas id="hero-3d-canvas"></canvas>
+
+<!-- HERO -->
+<section class="hero" id="hero-section">
+  <div class="hero-inner">
+    <p class="hero-eyebrow reveal" id="hero-eyebrow">Premier Local Business</p>
+    <h1 class="reveal stagger-1" id="hero-h1">Your business <span>deserves</span> the best.</h1>
+    <p class="hero-sub reveal stagger-2" id="hero-sub">Expert services tailored to you — right here in your city.</p>
+    <div class="hero-actions reveal stagger-3">
+      <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Book a Free Consultation</button>
+      <button class="btn-outline" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">View Services</button>
+    </div>
+    <div class="hero-trust reveal stagger-4">
+      <div><div class="trust-num" id="trust-rating">4.9★</div><div class="trust-label">Google rating</div></div>
+      <div><div class="trust-num">500+</div><div class="trust-label">Happy clients</div></div>
+      <div><div class="trust-num">5yr</div><div class="trust-label">Experience</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services-bg" id="services">
+  <div class="services-section">
+    <div class="section-inner">
+      <p class="section-label reveal">What we offer</p>
+      <h2 class="section-title reveal stagger-1">Our services</h2>
+      <p class="section-sub reveal stagger-2">Every service delivered by experienced professionals using the latest techniques.</p>
+      <div class="services-grid" id="services-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS (conditionally shown) -->
+<section id="reviews" style="display:none;" class="reviews-strip">
+  <div class="reviews-section">
+    <div class="section-inner">
+      <p class="section-label reveal">What clients say</p>
+      <h2 class="section-title reveal stagger-1">Real reviews</h2>
+      <div class="review-grid reveal stagger-2" id="review-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="gallery-section">
+    <div class="section-inner">
+      <p class="section-label reveal">Real results</p>
+      <h2 class="section-title reveal stagger-1">Before &amp; after</h2>
+      <p class="section-sub reveal stagger-2" id="gallery-sub">Every result is from a real client. Results may vary.</p>
+      <div class="gallery-grid">
+        <div class="ba-card reveal stagger-1"><div class="ba-images"><div class="ba-side before"><span class="ba-label">Before</span>Photo</div><div class="ba-side after"><span class="ba-label">After</span>Photo</div><div class="ba-divider"></div></div><div class="ba-info"><div><div class="ba-treatment" id="ba-t1">Treatment 1</div><div class="ba-sessions">Same day results</div></div><span class="ba-tag">Popular</span></div></div>
+        <div class="ba-card reveal stagger-2"><div class="ba-images"><div class="ba-side before"><span class="ba-label">Before</span>Photo</div><div class="ba-side after"><span class="ba-label">After</span>Photo</div><div class="ba-divider"></div></div><div class="ba-info"><div><div class="ba-treatment" id="ba-t2">Treatment 2</div><div class="ba-sessions">Results in days</div></div><span class="ba-tag">Best value</span></div></div>
+        <div class="ba-card reveal stagger-3"><div class="ba-images"><div class="ba-side before"><span class="ba-label">Before</span>Photo</div><div class="ba-side after"><span class="ba-label">After</span>Photo</div><div class="ba-divider"></div></div><div class="ba-info"><div><div class="ba-treatment" id="ba-t3">Treatment 3</div><div class="ba-sessions">Course of sessions</div></div><span class="ba-tag">Trending</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-bg">
+  <div class="contact-section">
+    <div class="section-inner">
+      <div class="contact-grid">
+        <div>
+          <p class="section-label reveal">Get in touch</p>
+          <h2 class="section-title reveal stagger-1">Book your consultation</h2>
+          <p class="section-sub reveal stagger-2">Your first consultation is completely free.</p>
+          <div class="contact-info-item reveal stagger-3"><div class="contact-icon">📍</div><div><div class="contact-detail-label">Address</div><div class="contact-detail-value" id="c-address">Your address</div></div></div>
+          <div class="contact-info-item reveal stagger-4"><div class="contact-icon">📞</div><div><div class="contact-detail-label">Phone</div><div class="contact-detail-value" id="c-phone">Your phone</div></div></div>
+          <div class="contact-info-item reveal stagger-5"><div class="contact-icon">✉️</div><div><div class="contact-detail-label">Email</div><div class="contact-detail-value" id="c-email">Your email</div></div></div>
+          <div class="contact-info-item reveal"><div class="contact-icon">🕐</div><div><div class="contact-detail-label">Hours</div><div class="contact-detail-value">Mon–Fri 9am–7pm · Sat 10am–5pm</div></div></div>
+        </div>
+        <div class="contact-form reveal stagger-1">
+          <div class="form-title">Request a booking</div>
+          <div class="form-sub">We'll confirm within 2 hours.</div>
+          <div class="form-row"><div class="form-field"><label>First name</label><input type="text" placeholder="Sarah"/></div><div class="form-field"><label>Last name</label><input type="text" placeholder="Johnson"/></div></div>
+          <div class="form-field"><label>Phone</label><input type="tel" id="form-phone" placeholder=""/></div>
+          <div class="form-field"><label>Email</label><input type="email" placeholder="you@email.com"/></div>
+          <div class="form-field"><label>Service</label><select id="form-service-select"><option value="">Select a service...</option></select></div>
+          <div class="form-field"><label>Message</label><textarea placeholder="Any questions..."></textarea></div>
+          <button class="form-submit" onclick="document.getElementById('form-success').style.display='block';setTimeout(()=>document.getElementById('form-success').style.display='none',5000)">Request My Free Consultation</button>
+          <div class="success-msg" id="form-success">✓ Request received! We'll be in touch within 2 hours.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo" id="footer-logo">Business Name</div>
+  <div class="footer-tagline" id="footer-tagline">Tagline here</div>
+  <ul class="footer-links"><li><a href="#services">Services</a></li><li><a href="#gallery">Results</a></li><li><a href="#contact">Contact</a></li></ul>
+  <div class="footer-bottom" id="footer-copy">&copy; 2026 · All rights reserved</div>
+</footer>
+
+<!-- PROPOSAL BUTTON -->
+<button class="proposal-btn" onclick="toggleProposal()" id="proposal-toggle-btn">
+  <span class="pb-dot"></span>
+  View Proposal &amp; Pricing
+</button>
+
+<!-- PROPOSAL PANEL -->
+<div class="proposal-panel" id="proposal-panel">
+  <div class="proposal-header">
+    <div class="proposal-title">Your Website Proposal</div>
+    <button class="proposal-close" onclick="toggleProposal()">×</button>
+  </div>
+  <div class="proposal-body">
+    <p style="font-size:14px;color:#8a6858;margin-bottom:1.5rem;" id="proposal-intro">Here are the three website packages available for your business.</p>
+
+    <div class="p-tier-grid" id="p-tier-grid">
+      <div class="p-tier selected" id="pt-standard" onclick="selectProposalTier('standard',2500)">
+        <div class="p-tier-name">Standard</div>
+        <div class="p-tier-price">$2,500<span>/one-off</span></div>
+        <ul class="p-tier-feats">
+          <li>Fully responsive website</li><li>Up to 6 pages</li><li>Booking form</li>
+          <li>Mobile optimised</li><li>Gallery section</li><li>1 revision round</li>
+        </ul>
+      </div>
+      <div class="p-tier" id="pt-premium" onclick="selectProposalTier('premium',4500)">
+        <div class="p-tier-name">Premium</div>
+        <div class="p-tier-price">$4,500<span>/one-off</span></div>
+        <ul class="p-tier-feats">
+          <li>Everything in Standard</li><li>Parallax animations</li><li>Photo lightbox gallery</li>
+          <li>Content management</li><li>Review integration</li><li>2 revision rounds</li>
+        </ul>
+      </div>
+      <div class="p-tier" id="pt-signature" onclick="selectProposalTier('signature',7500)">
+        <div class="p-tier-name">Signature 3D</div>
+        <div class="p-tier-price">$7,500<span>+/one-off</span></div>
+        <ul class="p-tier-feats">
+          <li>Everything in Premium</li><li>Three.js 3D hero</li><li>Particle effects</li>
+          <li>Custom animations</li><li>Bespoke design</li><li>Unlimited revisions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="payment-section">
+      <div class="payment-amount" id="pay-amount">$2,500</div>
+      <div class="payment-label" id="pay-label">Standard package — full payment</div>
+
+      <button class="pay-full-btn" id="pay-full-btn" onclick="handlePayFull()">
+        Pay $2,500 in Full →
+      </button>
+
+      <div class="split-link">
+        <button onclick="toggleSplitOptions()">Prefer to split payments?</button>
+      </div>
+      <div class="split-options" id="split-options">
+        <div style="font-size:12px;color:#8a6858;margin-bottom:10px;">Choose a payment plan:</div>
+        <button class="split-opt-btn" onclick="handleSplitPay(2)">2 payments &nbsp;<span id="split-2-amount">$1,250 each</span></button>
+        <button class="split-opt-btn" onclick="handleSplitPay(3)">3 payments &nbsp;<span id="split-3-amount">$833 each</span></button>
+        <button class="split-opt-btn" onclick="handleSplitPay(4)">4 payments &nbsp;<span id="split-4-amount">$625 each</span></button>
+      </div>
+      <div class="pay-status" id="pay-status"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG FROM URL HASH ───────────────────────────────────────────────────────
+let CONFIG = null;
+let selectedTier = 'standard';
+let selectedTierPrice = 2500;
+
+function loadConfig() {
+  const hash = location.hash.slice(1);
+  if (!hash) return null;
+  try {
+    return JSON.parse(decodeURIComponent(atob(hash)));
+  } catch(e) {
+    console.warn('Could not parse config from URL hash:', e);
+    return null;
+  }
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function applyTheme(style) {
+  const themes = {
+    warm:    {cream:'#fdf8f3',warm:'#f5ede0',blush:'#d4a89a',rose:'#b8725f',brown:'#6b4035',text:'#2c1a12',muted:'#8a6858',hero:'#f0e6d8',nav:'rgba(253,248,243,0.92)'},
+    luxury:  {cream:'#0d0d14',warm:'#14141f',blush:'#c9a84c',rose:'#c9a84c',brown:'#a08030',text:'#ede8d8',muted:'#9a9280',hero:'#0d0d14',nav:'rgba(13,13,20,0.96)'},
+    minimal: {cream:'#ffffff',warm:'#f5f5f5',blush:'#333333',rose:'#111111',brown:'#000000',text:'#111111',muted:'#777777',hero:'#f8f8f8',nav:'rgba(255,255,255,0.96)'},
+    bold:    {cream:'#0e0024',warm:'#1a0038',blush:'#e040fb',rose:'#e040fb',brown:'#9c00c0',text:'#f0e0ff',muted:'#b090cc',hero:'#130030',nav:'rgba(14,0,36,0.95)'},
+    blush:   {cream:'#fff5f8',warm:'#fce4ec',blush:'#c48fa0',rose:'#ad6b80',brown:'#7a3b50',text:'#3d1a26',muted:'#8c6070',hero:'#fff0f4',nav:'rgba(255,245,248,0.92)'},
+  };
+  const t = themes[style] || themes.warm;
+  const root = document.documentElement;
+  root.style.setProperty('--cream', t.cream);
+  root.style.setProperty('--warm', t.warm);
+  root.style.setProperty('--blush', t.blush);
+  root.style.setProperty('--rose', t.rose);
+  root.style.setProperty('--brown', t.brown);
+  root.style.setProperty('--text', t.text);
+  root.style.setProperty('--muted', t.muted);
+  root.style.setProperty('--hero-bg', t.hero);
+  root.style.setProperty('--c-nav', t.nav);
+  root.style.setProperty('--c-accent', t.rose);
+  root.style.setProperty('--c-dark', t.brown);
+}
+
+function populatePage(cfg) {
+  const biz = cfg.business || cfg.demo || {};
+  const name = biz.name || 'Your Business';
+  const city = biz.city || '';
+  const tagline = biz.tagline || 'Expert service, trusted results.';
+
+  document.title = name + ' — Website Proposal';
+  document.getElementById('nav-logo').textContent = name;
+  document.getElementById('hero-eyebrow').textContent = (city ? city + "'s " : '') + 'Premier ' + (biz.type || 'Business');
+  document.getElementById('hero-h1').innerHTML = 'Your business <span>deserves</span> the best.';
+  document.getElementById('hero-sub').textContent = 'Expert ' + (biz.type || 'services') + ' tailored to you' + (city ? ' — right here in ' + city : '') + '.';
+  document.getElementById('trust-rating').textContent = (biz.googleRating || '4.9') + '★';
+  document.getElementById('c-address').textContent = biz.address || 'Your address';
+  document.getElementById('c-phone').textContent = biz.phone || 'Your phone';
+  document.getElementById('c-email').textContent = biz.email || 'Your email';
+  document.getElementById('form-phone').placeholder = biz.phone || '';
+  document.getElementById('footer-logo').textContent = name;
+  document.getElementById('footer-tagline').textContent = tagline;
+  document.getElementById('footer-copy').textContent = '© 2026 ' + name + (city ? ' · ' + city : '') + ' · All rights reserved';
+  document.getElementById('gallery-sub').textContent = 'Every result is from a real client treated right here at ' + name + '. Results may vary.';
+  document.getElementById('proposal-intro').textContent = 'Here are three website packages available for ' + name + '.';
+
+  // Services
+  const services = (biz.services && biz.services.length) ? biz.services : [];
+  const grid = document.getElementById('services-grid');
+  grid.innerHTML = services.map(s => `
+    <div class="service-card">
+      <div class="service-icon">${s.icon||'✦'}</div>
+      <div class="service-name">${esc(s.name)}</div>
+      <div class="service-desc">${esc(s.desc||'')}</div>
+      <div class="service-price">$${esc(s.price)} <span>/ ${esc(s.unit)}</span></div>
+    </div>`).join('');
+
+  // BA treatments
+  const names = services.map(s=>s.name);
+  if(names[0]) document.getElementById('ba-t1').textContent = names[0];
+  if(names[1]) document.getElementById('ba-t2').textContent = names[1];
+  if(names[2]) document.getElementById('ba-t3').textContent = names[2];
+
+  // Service select
+  const sel = document.getElementById('form-service-select');
+  sel.innerHTML = '<option value="">Select a service...</option>' + services.map(s=>`<option>${esc(s.name)}</option>`).join('') + '<option>Not sure — book a consultation</option>';
+
+  // Reviews
+  const reviewText = biz.reviewHighlights || '';
+  if (reviewText.trim()) {
+    const reviews = reviewText.split(/\n+---\n+/).filter(Boolean);
+    if (reviews.length) {
+      document.getElementById('reviews').style.display = '';
+      document.getElementById('review-grid').innerHTML = reviews.map(r =>
+        `<blockquote class="review-card">&ldquo;${esc(r.trim()).replace(/\n/g,'<br>')}&rdquo;</blockquote>`
+      ).join('');
+    }
+  }
+
+  // Theme
+  applyTheme(biz.style || 'warm');
+
+  // Update tier prices based on quote config
+  if (cfg.tier && cfg.total) {
+    const tierMap = {standard:2500,premium:4500,signature:7500};
+    selectProposalTier(cfg.tier, cfg.tierBase || tierMap[cfg.tier] || 2500);
+  }
+}
+
+// ── PROPOSAL PANEL ─────────────────────────────────────────────────────────────
+function toggleProposal() {
+  const panel = document.getElementById('proposal-panel');
+  panel.classList.toggle('open');
+}
+
+function selectProposalTier(name, price) {
+  selectedTier = name;
+  selectedTierPrice = price;
+  ['standard','premium','signature'].forEach(t => {
+    document.getElementById('pt-'+t).classList.toggle('selected', t === name);
+  });
+  const fmt = '$' + price.toLocaleString();
+  document.getElementById('pay-amount').textContent = fmt;
+  document.getElementById('pay-label').textContent = name.charAt(0).toUpperCase()+name.slice(1) + ' package — full payment';
+  document.getElementById('pay-full-btn').textContent = 'Pay ' + fmt + ' in Full →';
+  // Update split amounts
+  [2,3,4].forEach(n => {
+    const el = document.getElementById('split-'+n+'-amount');
+    if(el) el.textContent = '$' + Math.round(price/n).toLocaleString() + ' each';
+  });
+}
+
+function toggleSplitOptions() {
+  document.getElementById('split-options').classList.toggle('show');
+}
+
+async function handlePayFull() {
+  await triggerStripeLink('full', 1);
+}
+
+async function handleSplitPay(installments) {
+  await triggerStripeLink('deposit', installments);
+}
+
+async function triggerStripeLink(mode, installments) {
+  const workerUrl = (CONFIG && CONFIG.workerUrl) || '';
+  const statusEl = document.getElementById('pay-status');
+  const btn = document.getElementById('pay-full-btn');
+  const bizName = (CONFIG && CONFIG.business && CONFIG.business.name) || 'Website Project';
+  const tierLabel = selectedTier.charAt(0).toUpperCase() + selectedTier.slice(1);
+
+  if (!workerUrl) {
+    statusEl.className = 'pay-status err show';
+    statusEl.textContent = 'Payment setup not configured. Please contact us directly.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.className = 'pay-status working show';
+  statusEl.textContent = mode === 'deposit'
+    ? `Creating ${installments}-payment plan…`
+    : 'Creating secure payment link…';
+
+  try {
+    const res = await fetch(workerUrl + '/stripe/create-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: selectedTierPrice * 100,
+        name: `${bizName} — ${tierLabel} Website`,
+        description: `LocalEdge ${tierLabel} package`,
+        mode, installments,
+        currency: 'usd',
+      })
+    });
+    const d = await res.json();
+    if (d.error || !d.url) throw new Error(d.error || 'Could not create payment link');
+
+    statusEl.className = 'pay-status ok show';
+    const depositAmt = mode === 'deposit' ? '$' + (d.amount/100).toLocaleString() : null;
+    statusEl.innerHTML = `✓ Payment link ready! <a href="${d.url}" target="_blank" style="color:#2d6e45;font-weight:500;text-decoration:underline;">Open Stripe Checkout →</a>${depositAmt ? '<br><span style="font-size:11px;opacity:0.8;">First payment: ' + depositAmt + '</span>' : ''}`;
+
+    // Open Stripe checkout in new tab
+    window.open(d.url, '_blank');
+
+  } catch(e) {
+    statusEl.className = 'pay-status err show';
+    statusEl.textContent = 'Could not create payment link: ' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── THREE.JS PARTICLE BACKGROUND ─────────────────────────────────────────────
+function init3D() {
+  const canvas = document.getElementById('hero-3d-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 5;
+
+  // Floating particle field
+  const count = 600;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 12;
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.PointsMaterial({ color: 0xb8725f, size: 0.04, transparent: true, opacity: 0.6 });
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  // Soft orbiting torus
+  const torus = new THREE.Mesh(
+    new THREE.TorusGeometry(1.5, 0.08, 16, 80),
+    new THREE.MeshBasicMaterial({ color: 0xd4a89a, transparent: true, opacity: 0.25, wireframe: true })
+  );
+  scene.add(torus);
+
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  let t = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    t += 0.004;
+    points.rotation.y = t * 0.15;
+    points.rotation.x = t * 0.08;
+    torus.rotation.x = t * 0.3;
+    torus.rotation.y = t * 0.2;
+    renderer.render(scene, camera);
+  })();
+}
+
+// ── SCROLL REVEAL ─────────────────────────────────────────────────────────────
+function initReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+// Nav shrink on scroll
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-nav');
+  nav.style.padding = window.scrollY > 60 ? '0.75rem 3rem' : '1.25rem 3rem';
+}, { passive: true });
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+CONFIG = loadConfig();
+if (CONFIG) {
+  populatePage(CONFIG);
+} else {
+  // No config — show placeholder content
+  document.getElementById('hero-eyebrow').textContent = 'Your City\'s Premier Business';
+  document.getElementById('services-grid').innerHTML = '<div style="color:#8a6858;font-size:14px;padding:2rem;">Open this page from LocalEdge with a business selected to see the full demo.</div>';
+}
+
+try { init3D(); } catch(e) { console.warn('3D init failed:', e); }
+initReveal();
+</script>
+</body>
+</html>
